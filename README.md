@@ -3,6 +3,8 @@
 # Kaizen
 </div>
 
+<img src="./logo/漸_2_-removebg-preview.png">
+
 ## Why Watch Anime Like a Normie?
 Ever tried watching anime from the terminal? Yeah, me neither. But one day, while staring into the abyss of CLI tools and minimalism-induced existential dread, we thought: Why not?
 
