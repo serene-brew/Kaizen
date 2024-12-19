@@ -1,0 +1,15 @@
+DefaultForeground:
+  light: "#874Bfd"
+  dark: "#7d56f4"
+
+DefaultUnfocused:
+  light: "#3a3a3a"
+  dark: "#b0b0b0"
+
+DefaultActiveTab:
+  light: "#9F2B68"
+  dark: "#AA336A"
+
+Tab1Focus:
+  active: "#9F2B68"
+  inactive: "8"
