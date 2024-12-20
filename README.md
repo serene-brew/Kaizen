@@ -20,6 +20,10 @@ No more context-switching, no more bloated browser tabs screaming at your CPU li
 
 So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode. 🌸✨ Terminal supremacy, but make it anime. 🎉
 
+
+https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
+
+
 <div align="center">
   
 ## Contributors
@@ -27,5 +31,4 @@ So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode.
   
 <a href="github.com/mintRaven-05"><img src="https://github.com/user-attachments/assets/2a8d88d5-58a7-43ed-ab2e-d8896c272904" height=70 width=70)></a>
 <a href="github.com/ImonChakraborty"><img src="https://github.com/user-attachments/assets/50c4e290-6ec7-4390-bc76-51c0e9ea1cae" height=70 width=70></a>
-<img src="./assets/kaizen.gif">
 </div>
