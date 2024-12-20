@@ -10,6 +10,17 @@ DefaultActiveTab:
   light: "#9F2B68"
   dark: "#AA336A"
 
-Tab1Focus:
-  active: "#9F2B68"
-  inactive: "8"
+Tab1:
+  focus:
+    active: "#9F2B68"
+    inactive: "#666666"
+  table:
+    selected: 
+      foreground: "#ffffcc"
+      background: "#5c5cd6"
+  spinner:
+     color: "#AA336A"
+     msg:
+      color: "#c43b7b"
+  ASCII Art:
+      color: "#AA336A"
