@@ -8,10 +8,6 @@
 </div>
 <div align="center">
 
-[![stars](https://img.shields.io/github/stars/serene-brew/kaizen?style=social)](https://github.com/serene-brew/kaizen/stargazers)
-[![forks](https://img.shields.io/github/forks/serene-brew/kaizen?style=social)](https://github.com/serene-brew/kaizen/network/members)
-[![issues](https://img.shields.io/github/issues/serene-brew/kaizen?style=social&logo=github)](https://github.com/serene-brew/kaizen/issues?q=is%3Aissue+is%3Aopen+)
-[![version](https://img.shields.io/github/v/release/serene-brew/kaizen?display_name=release&style=social&logo=github)](https://github.com/serene-brew/kaizen/releases/latest)
 </div>
 
 ## Why Watch Anime Like a Normie?
