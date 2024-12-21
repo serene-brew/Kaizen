@@ -13,7 +13,7 @@ else
     echo -e "${YELLOW}[!]A new version of kaizen is released${NC}"
     echo -e "${GREEN}[+]Downloading latest update...${NC}"
         
-    if [ -d "$HOME/kaizen" ]; then
+    if [ -d "$HOME/Kaizen" ]; then
       rm -rf ~/Kaizen
       git clone https://github.com/serene-brew/Kaizen.git ~/Kaizen
 
