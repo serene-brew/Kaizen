@@ -1,4 +1,4 @@
-package main
+package src
 
 import(
 	"os"
@@ -21,7 +21,7 @@ import(
  */
 
 
-func expandPath(path string) string {
+func ExpandPath(path string) string {
 	if len(path) > 0 && path[:1] == "~" {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -32,7 +32,7 @@ func expandPath(path string) string {
 	return path
 }
 
-func executeAppStub() {
+func ExecuteAppStub() {
 	m := MainModel{
 		currentTab: 0,
 		tab1:       NewTab1Model(),
@@ -56,8 +56,8 @@ func executeAppStub() {
  * and the program exits with a non-zero status.
  */
 
-func runUpdateScript() {
-	script := expandPath("~/.local/kaizen/update.sh") 
+func RunUpdateScript() {
+	script := ExpandPath("~/.local/kaizen/update.sh") 
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -76,8 +76,8 @@ func runUpdateScript() {
  * and the program exits with a non-zero status.
  */
 
-func runUninstalScript() {
-	script := expandPath("~/.local/kaizen/uninstall.sh") 
+func RunUninstalScript() {
+	script := ExpandPath("~/.local/kaizen/uninstall.sh") 
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -95,8 +95,8 @@ func runUninstalScript() {
  * If the script fails to run, an error message is displayed on the terminal,
  * and the program exits with a non-zero status.
  */
-func viewVersion() {
-	script := expandPath("~/.local/kaizen/VERSION") 
+func ViewVersion() {
+	script := ExpandPath("~/.local/kaizen/VERSION") 
 	cmd := exec.Command("cat", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
