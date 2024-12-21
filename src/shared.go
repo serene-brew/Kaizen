@@ -76,7 +76,7 @@ func runUpdateScript() {
  * and the program exits with a non-zero status.
  */
 
-func runUninstallScript() {
+func runUninstalScript() {
 	script := expandPath("~/.local/kaizen/uninstall.sh") 
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
