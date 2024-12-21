@@ -85,4 +85,3 @@ func getStreamLink(id string, espisodeType string, episodeNumber string) (string
 
 	return response.Link, nil
 }
-
