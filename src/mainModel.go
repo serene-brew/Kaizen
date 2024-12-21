@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"flag"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
