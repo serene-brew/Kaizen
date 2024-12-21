@@ -60,8 +60,7 @@ https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 <h2> Known issues </h2>
 This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor
 
-![Fixed for small size](assets/kaizen_issue_resolved.gif)
-
+<img src="./assets/kaizen_issue_solved.gif">
 
 <h2 align="center"> Contributors </h2>
 <div align="center">
