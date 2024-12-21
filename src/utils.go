@@ -1,11 +1,9 @@
 package main
 import (
-	"os"
 	"fmt"
 	"strconv"
 	"strings"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/list"
