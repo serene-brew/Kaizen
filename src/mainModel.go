@@ -117,6 +117,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.tab1.loading {
 				var cmd tea.Cmd
 				m.tab1.spinner, cmd = m.tab1.spinner.Update(msg)
+				return m, cmd
 			}
 		}
 	return m, nil
