@@ -2,23 +2,23 @@ package src
 
 import "github.com/charmbracelet/bubbles/key"
 
-//pre-defined keymaps for the TUI
+// pre-defined keymaps for the TUI
 type keyMap struct {
-	Esc   key.Binding
-	Tab   key.Binding
-	List1  key.Binding
-	List2 key.Binding
-	Table key.Binding
-	Enter key.Binding
-	Input key.Binding
+	Esc     key.Binding
+	Tab     key.Binding
+	List1   key.Binding
+	List2   key.Binding
+	Table   key.Binding
+	Enter   key.Binding
+	Input   key.Binding
 	CtrlTab key.Binding
 }
 
-/* newKeyMap 
+/* newKeyMap
  * ---------
  * returns a keyMap consisting of keybinds
  * used a shared function but for the TUI
-*/
+ */
 func newKeyMap() keyMap {
 	return keyMap{
 		Input: key.NewBinding(
@@ -53,7 +53,5 @@ func newKeyMap() keyMap {
 			key.WithKeys("ctrl+tab"),
 			key.WithHelp("ctrl+tab", "switch tabs backward"),
 		),
-
-
 	}
 }

@@ -2,38 +2,38 @@ package src
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"log"
 	"path/filepath"
-	"github.com/spf13/viper"
 )
+
 /* Config struct defines the color configuration for different elements of the application.
  * It includes attributes for foreground, unfocused states, active tabs, and specific settings
  * for Tab1 such as focus state, table selection, spinner, and ASCII art colors.*/
 
-type Config struct{
- 	defaultForeground_light       string
- 	defaultForeground_dark        string
-	defaultUnfocused_light        string
-	defaultUnfocused_dark         string
-	defaultActiveTab_light        string
-	defaultActiveTab_dark         string
+type Config struct {
+	defaultForeground_light string
+	defaultForeground_dark  string
+	defaultUnfocused_light  string
+	defaultUnfocused_dark   string
+	defaultActiveTab_light  string
+	defaultActiveTab_dark   string
 
-	Tab1_FocusActive  	      string
-	Tab1_FocusInactive  	      string
-	Tab1_TableSelectedBackground  string
-	Tab1_TableSelectedForeground  string
-	Tab1_SpinnerColor             string
-	Tab1_SpinnerMsgColor 	      string
-	Tab1_kaizen_AscciArtColor     string
+	Tab1_FocusActive             string
+	Tab1_FocusInactive           string
+	Tab1_TableSelectedBackground string
+	Tab1_TableSelectedForeground string
+	Tab1_SpinnerColor            string
+	Tab1_SpinnerMsgColor         string
+	Tab1_kaizen_AscciArtColor    string
 }
-
 
 /* LoadConfig function initializes the Config struct by reading values from a YAML configuration file.
  * It uses the Viper library to locate and parse the configuration file, which is expected
  * to be found in the "~/.config/kaizen" directory under the name "config.yaml".
  * The function returns a populated Config struct instance.*/
 
-func LoadConfig() Config{
+func LoadConfig() Config {
 	configPath := ExpandPath("~/.config/kaizen")
 
 	viper.SetConfigFile(filepath.Join(configPath, "config.yaml"))
@@ -51,7 +51,7 @@ func LoadConfig() Config{
 	defaultActiveTab_light := viper.GetString("DefaultActiveTab.light")
 	defaultActiveTab_dark := viper.GetString("DefaultActiveTab.dark")
 
- 	Tab1_FocusActive := viper.GetString("Tab1.focus.active")
+	Tab1_FocusActive := viper.GetString("Tab1.focus.active")
 	Tab1_FocusInactive := viper.GetString("Tab1.focus.inactive")
 	Tab1_TableSelectedForeground := viper.GetString("Tab1.table.selected.foreground")
 	Tab1_TableSelectedBackground := viper.GetString("Tab1.table.selected.background")
