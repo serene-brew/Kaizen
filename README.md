@@ -27,11 +27,44 @@ So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode.
 
 https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 
+<h2 align="center"> Keybinds </h2>
 
-<div align="center">
+<table align=center>
+
+<tr><th> In app </th><th> In player </th></tr>
+<tr><td>
   
-## Contributors
-<div>
+| Operation       | Keybind       |
+|-----------------|----------------|
+| Toggle b/w tabs |     `tab`      |
+| Focus on Input  | `shift` + `1`  |
+| Focus on Results| `shift` + `2`  |
+| Focus on SUB ep | `shift` + `3`  |
+| Focus on DUB ep | `shift` + `4`  |
+| Exit the app    |     `esc`      |
+
+</td><td>
+
+| Operation       | Keybind       |
+|-----------------|----------------|
+| Pause and play  |    `space`     |
+| Forward & Backward  | `->` & `<-`  |
+| Volume Control  |    `9` & `0`   |
+| Mute Audio      |           `m`  |
+| Adjust Brightness | `3` & `4`  |
+| Exit the player |     `q`        |
+
+</td></tr> 
+</table>
+
+<h2> Known issues </h2>
+This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor
+
+![Fixed for small size](assets/kaizen_issue_resolved.gif)
+
+
+<h2 align="center"> Contributors </h2>
+<div align="center">
   
 <a href="https://github.com/mintRaven-05"><img src="https://github.com/user-attachments/assets/2a8d88d5-58a7-43ed-ab2e-d8896c272904" height=70 width=70)></a>
 <a href="https://github.com/ImonChakraborty"><img src="https://github.com/user-attachments/assets/50c4e290-6ec7-4390-bc76-51c0e9ea1cae" height=70 width=70></a>
