@@ -1,8 +1,8 @@
 package src
 
-import(
-	"os"
+import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -20,7 +20,6 @@ import(
  * - If the path doesn't start with `~`, the function returns the original path.
  */
 
-
 func ExpandPath(path string) string {
 	if len(path) > 0 && path[:1] == "~" {
 		homeDir, err := os.UserHomeDir()
@@ -34,15 +33,15 @@ func ExpandPath(path string) string {
 
 func ExecuteAppStub() {
 	m := MainModel{
-		currentTab: 0,
-		tab1:       NewTab1Model(),
-		tab2:       NewTab2Model(),
-		styles:     NewTabStyles(),
+		currentTab:    0,
+		tab1:          NewTab1Model(),
+		tab2:          NewTab2Model(),
+		styles:        NewTabStyles(),
 		currentScreen: AppScreen,
 	}
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
-	if _,err := p.Run(); err != nil {
+	if _, err := p.Run(); err != nil {
 		fmt.Printf("Error starting app: %v\n", err)
 	}
 }
@@ -57,7 +56,7 @@ func ExecuteAppStub() {
  */
 
 func RunUpdateScript() {
-	script := ExpandPath("~/.local/kaizen/update.sh") 
+	script := ExpandPath("~/.local/kaizen/update.sh")
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -77,7 +76,7 @@ func RunUpdateScript() {
  */
 
 func RunUninstalScript() {
-	script := ExpandPath("~/.local/kaizen/uninstall.sh") 
+	script := ExpandPath("~/.local/kaizen/uninstall.sh")
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -96,7 +95,7 @@ func RunUninstalScript() {
  * and the program exits with a non-zero status.
  */
 func ViewVersion() {
-	script := ExpandPath("~/.local/kaizen/VERSION") 
+	script := ExpandPath("~/.local/kaizen/VERSION")
 	cmd := exec.Command("cat", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

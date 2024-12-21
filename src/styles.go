@@ -1,8 +1,8 @@
 package src
 
 import (
-	gloss "github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/bubbles/table"
+	gloss "github.com/charmbracelet/lipgloss"
 )
 
 var conf = LoadConfig()
@@ -13,13 +13,13 @@ It includes styles for tabs, active tabs, tab spacers, tab indicators, and the t
 The styles use the Lipgloss library to manage colors, borders, and padding.
 */
 type Styles struct {
-	Tab             gloss.Style
-	ActiveTab       gloss.Style
-	TabSpacer       gloss.Style
-	TabIndicator    gloss.Style
+	Tab               gloss.Style
+	ActiveTab         gloss.Style
+	TabSpacer         gloss.Style
+	TabIndicator      gloss.Style
 	TabIndicatorLeft  string
 	TabIndicatorRight string
-	TabWindow       gloss.Style
+	TabWindow         gloss.Style
 }
 
 /*
@@ -28,12 +28,12 @@ This includes borders for lists, inputs, tables, and active/inactive color prope
 It uses the Lipgloss library for consistent styling throughout the UI.
 */
 type Tab1styles struct {
-	list1Border    gloss.Style
-	list2Border    gloss.Style
-	inputBorder    gloss.Style
-	tableBorder    gloss.Style
-	activeColor    string
-	inactiveColor  string
+	list1Border   gloss.Style
+	list2Border   gloss.Style
+	inputBorder   gloss.Style
+	tableBorder   gloss.Style
+	activeColor   string
+	inactiveColor string
 }
 
 /*
@@ -95,25 +95,25 @@ var (
 	}
 
 	tableStyle = gloss.NewStyle().
-		Border(thinRoundedBorder).
-		BorderForeground(gloss.Color("63"))
+			Border(thinRoundedBorder).
+			BorderForeground(gloss.Color("63"))
 
 	headerStyle = gloss.NewStyle().
-		Bold(true).
-		Foreground(gloss.Color("208"))
+			Bold(true).
+			Foreground(gloss.Color("208"))
 
 	selectedStyle = gloss.NewStyle().
-		Foreground(gloss.Color("229")).
-		Background(gloss.Color("63"))
+			Foreground(gloss.Color("229")).
+			Background(gloss.Color("63"))
 
 	contentStyle = gloss.NewStyle().
-		Border(DefaultWindowBorder, true).
-		BorderForeground(DefaultForegroundColor)
+			Border(DefaultWindowBorder, true).
+			BorderForeground(DefaultForegroundColor)
 
 	centerStyle = gloss.NewStyle().
-		Align(gloss.Center).
-		Border(gloss.RoundedBorder()).
-		Padding(1, 2)
+			Align(gloss.Center).
+			Border(gloss.RoundedBorder()).
+			Padding(1, 2)
 )
 
 /*
@@ -172,7 +172,7 @@ func Tab1Styles() Tab1styles {
 			Border(gloss.RoundedBorder()).
 			BorderForeground(gloss.Color(conf.Tab1_FocusInactive)).
 			Padding(1),
-		activeColor:   conf.Tab1_FocusActive, // Orange
+		activeColor:   conf.Tab1_FocusActive,   // Orange
 		inactiveColor: conf.Tab1_FocusInactive, // Gray
 	}
 }
@@ -196,4 +196,3 @@ func getTableStyles() table.Styles {
 
 	return s
 }
-

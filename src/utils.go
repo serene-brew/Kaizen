@@ -1,12 +1,13 @@
 package src
+
 import (
 	"fmt"
+	"os/exec"
 	"strconv"
 	"strings"
-	"os/exec"
 
-	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -20,7 +21,7 @@ func (m *Tab1Model) generateRows(data [][]interface{}) []table.Row {
 	rows := []table.Row{}
 	for i, item := range data {
 		rows = append(rows, table.Row{
-			strconv.Itoa(i+1),
+			strconv.Itoa(i + 1),
 			item[1].(string),
 			strconv.Itoa(int(item[2].(float64))),
 			strconv.Itoa(int(item[3].(float64))),
@@ -56,7 +57,7 @@ It operates similarly to streamSubAnime, but it sets the episode type to "dub"
 and fetches the streaming link accordingly before playing the episode with MPV.
 */
 func (m *Tab1Model) streamDubAnime() {
-	DubEpisodeString := fmt.Sprintf("%s",m.listTwo.SelectedItem()) //nolint:govet // Ignore the warning for this line
+	DubEpisodeString := fmt.Sprintf("%s", m.listTwo.SelectedItem()) //nolint:govet // Ignore the warning for this line
 	DubEpisodeString = DubEpisodeString[8:12]
 	DubEpisodeString = strings.ReplaceAll(DubEpisodeString, " ", "")
 	m.dubSelectedNum = DubEpisodeString
@@ -109,4 +110,3 @@ func (m *Tab1Model) fetchAnimeData(query string) tea.Cmd {
 		return data
 	}
 }
-
