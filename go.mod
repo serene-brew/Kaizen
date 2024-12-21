@@ -1,4 +1,4 @@
-module github.com/serene-brew/kaizen/src
+module github.com/serene-brew/kaizen
 
 go 1.23.3
 
