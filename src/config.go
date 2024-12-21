@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ type Config struct{
  * The function returns a populated Config struct instance.*/
 
 func LoadConfig() Config{
-	configPath := expandPath("~/.config/kaizen")
+	configPath := ExpandPath("~/.config/kaizen")
 
 	viper.SetConfigFile(filepath.Join(configPath, "config.yaml"))
 	err := viper.ReadInConfig()
