@@ -13,11 +13,13 @@ import (
 )
 type AppState int
 
+//AppStates for AppScreen and ErrorScreen for window resize errors 
 const (
 	AppScreen AppState = iota
 	ErrorScreen
 )
 
+//minimum height and width required by the app  
 const(
 	minWidth=100
 	minHeight=40
@@ -40,6 +42,12 @@ func (m MainModel) Init() tea.Cmd {
 	return nil
 }
 
+
+/* Update handles incoming messages and updates the MainModel's state.
+ * Parameters:
+ * - msg: The incoming message to handle.
+ * Returns: An updated MainModel and a command to execute.
+*/
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -51,6 +59,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentScreen = AppScreen
 		}
 	case tea.KeyMsg:
+		//this switch handles when to show AppScreen and when to overlay the ErrorScreen over the AppScreen
 		switch m.currentScreen{
 			case AppScreen:
 				switch msg.String() {
@@ -94,7 +103,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tea.Quit
 			}
 		}
-		
+	
+		// this case handels the table output generation for the collected anime list from the API
 		case [][]interface{}:
 			m.tab1.data = msg
 			m.tab1.table.SetRows(m.tab1.generateRows(msg))
@@ -114,6 +124,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 
+// View renders the current screen based on the AppState.
+// Returns: A string representing the current screen's content.
 func (m MainModel) View() string {
 	switch m.currentScreen{
 		case AppScreen:
@@ -149,6 +161,8 @@ Please resize the window to either full screen or reduce the text size of the wi
 	return ""
 }
 
+
+//Main entrypoint for the application
 func main() {
 	runShell := flag.Bool("u", false, "Run the shell script")
 	flag.Parse()
