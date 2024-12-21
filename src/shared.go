@@ -66,3 +66,42 @@ func runUpdateScript() {
 		os.Exit(1)
 	}
 }
+
+/*
+ * runUninstallScript
+ * ------------------
+ * This function is responsible for executing a shell script that uninstall
+ * the application
+ * If the script fails to run, an error message is displayed on the terminal,
+ * and the program exits with a non-zero status.
+ */
+
+func runUninstallScript() {
+	script := expandPath("~/.local/kaizen/uninstall.sh") 
+	cmd := exec.Command("sh", script)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running shell script: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+/*
+ * viewVersion
+ * ------------------
+ * This function is responsible for printing the VERSION information of
+ * the application
+ * If the script fails to run, an error message is displayed on the terminal,
+ * and the program exits with a non-zero status.
+ */
+func viewVersion() {
+	script := expandPath("~/.local/kaizen/VERSION") 
+	cmd := exec.Command("cat", script)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running shell script: %v\n", err)
+		os.Exit(1)
+	}
+}
