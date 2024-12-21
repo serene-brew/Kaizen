@@ -71,9 +71,8 @@ cp config.yaml ~/.config/kaizen/
 echo -e "${GREEN}[✓] Kaizen installed${NC}"
 sleep 1
 
-# Create version file
-echo "1.0.0" > ~/.local/kaizen/version
-echo -e "${GREEN}[✓] Version file created${NC}"
+# Copy version file
+cp VERSION ~/.local/kaizen/
 sleep 1
 
 # Clean up build directory
