@@ -88,7 +88,29 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.tab2, cmd = m.tab2.Update(msg)
 					return m, cmd
 				}
+		case ErrorScreen:
+			switch msg.String() {
+				case "esc":
+					return m, tea.Quit
+			}
 		}
-	}
+		
+		case [][]interface{}:
+			m.tab1.data = msg
+			m.tab1.table.SetRows(m.tab1.generateRows(msg))
+			m.tab1.listOne.SetItems([]list.Item{item{title:"                         ", style:"none"}})
+			m.tab1.listTwo.SetItems([]list.Item{item{title:"                         ", style:"none"}})
+			m.tab1.listOne.SetShowStatusBar(false)
+			m.tab1.listTwo.SetShowStatusBar(false)
+		
+		case spinner.TickMsg:
+			if m.tab1.loading {
+				var cmd tea.Cmd
+				m.tab1.spinner, cmd = m.tab1.spinner.Update(msg)
+				return m, cmd
+			}
+		}
 	return m, nil
 }
+
+		
