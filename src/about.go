@@ -1,8 +1,8 @@
 package src
 
 import (
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type Tab2Model struct{}
@@ -32,12 +32,12 @@ func (m Tab2Model) View() string {
 		Border(lipgloss.NormalBorder(), false, false, true, false).
 		BorderForeground(lipgloss.Color("8")).
 		Align(lipgloss.Center).
-		Padding(2, 4).Margin(2,2)
+		Padding(2, 4).Margin(2, 2)
 	FooterStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#e6ffe6")).
 		Align(lipgloss.Center).
 		Padding(2, 4).
-		Margin(2,0)
+		Margin(2, 0)
 
 	link := lipgloss.NewStyle().Foreground(lipgloss.Color("#43BF6D")).Render
 
@@ -52,13 +52,13 @@ Just pure, uninterrupted anime bliss, wrapped in terminal aesthetics.
 Because why settle for basic when you can stream like a true minimalist? 
 Fire up Kaizen, queue up your favorite series, and let your terminal do what it was truly meant for.
 Enjoy your experience, and let Kaizen be your companion on your journey into the world of anime.`
-	
+
 	dialog := lipgloss.Place(70, 9,
-			lipgloss.Center, lipgloss.Center,
-			ui,
-			lipgloss.WithWhitespaceChars("改善"),
-			lipgloss.WithWhitespaceForeground(lipgloss.Color("#383838")),
-		)
+		lipgloss.Center, lipgloss.Center,
+		ui,
+		lipgloss.WithWhitespaceChars("改善"),
+		lipgloss.WithWhitespaceForeground(lipgloss.Color("#383838")),
+	)
 
 	mintRaven_github := link("https://github.com/mintRaven-05")
 	riserSama_github := link("https://github.com/ImonChakraborty")
@@ -66,37 +66,35 @@ Enjoy your experience, and let Kaizen be your companion on your journey into the
 	dev_community := link("https://dev.to/serene-brew")
 
 	short_title1 := "Want to see more from us? Follow us on our socials.\n"
-	socials := "•"+mintRaven_github+"\n•"+riserSama_github+"\n"
+	socials := "•" + mintRaven_github + "\n•" + riserSama_github + "\n"
 	socials_end := "(github is the only social life we have)\n"
 	socialsText := short_title1 + socials + socials_end
-	
+
 	short_title2 := "Check out the latest project from\n"
-	github := "•"+sereneBrew_github+"\n"
+	github := "•" + sereneBrew_github + "\n"
 	github_end := "Found a bug? Report at the project repository.\n\n"
 	serene_brew := short_title2 + github + github_end
 
 	short_title3 := "keep up with our latest posts and news at\n"
-	dev := "•"+dev_community+"\n"
+	dev := "•" + dev_community + "\n"
 	dev_end := "(dev.to is another social life we have for now)\n\n"
-	dev_text := short_title3 + dev+ dev_end
+	dev_text := short_title3 + dev + dev_end
 
 	email := link("\t  serene.brew.git@gmail.com")
-	email_text := "\t  ~developed by mintRaven & RiserSama\n"+email
+	email_text := "\t  ~developed by mintRaven & RiserSama\n" + email
 
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
 		lipgloss.JoinHorizontal(
-			lipgloss.Top, 
+			lipgloss.Top,
 			DescStyle.Render(desc),
 			DescStyle.Render(dialog)),
 		lipgloss.JoinHorizontal(
-			lipgloss.Top, 
+			lipgloss.Top,
 			LinksStyle.Render(socialsText),
 			lipgloss.JoinVertical(
-				lipgloss.Top, 
+				lipgloss.Top,
 				LinksStyle.Render(serene_brew),
 				FooterStyle.Render(email_text)),
 			LinksStyle.Render(dev_text)))
 }
-
-
