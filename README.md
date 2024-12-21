@@ -27,6 +27,40 @@ So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode.
 
 https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 
+<h2> Installation </h2>
+
+1. Clone the Repository
+```bash
+git clone https://github.com/serene-brew/Kaizen
+```
+
+2. Install it
+```bash
+chmod +x ./install.sh
+
+./install.sh
+```
+
+<h2> View Version Info </h2>
+
+```bash
+kaizen -v
+```
+
+<h2> Update and Uninstallation </h2>
+
+To update
+
+```bash
+kaizen -update
+```
+
+To uninstall
+```bash
+kaizen -uninstall
+```
+
+
 <h2 align="center"> Keybinds </h2>
 
 <table align=center>
@@ -48,7 +82,7 @@ https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 | Operation       | Keybind       |
 |-----------------|----------------|
 | Pause and play  |    `space`     |
-| Forward & Backward  | `->` & `<-`  |
+| Forward & Backward  | `→` & `←`  |
 | Volume Control  |    `9` & `0`   |
 | Mute Audio      |           `m`  |
 | Adjust Brightness | `3` & `4`  |
@@ -58,9 +92,16 @@ https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 </table>
 
 <h2> Known issues </h2>
-This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor
+<p>This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor.</p>
+
 
 <img src="./assets/kaizen_issue_solved.gif">
+
+<br/>
+
+<h2> Info about the API and the Backend </h2>
+
+<p>The API is Home grown by Serene Brew and due to the current circumstances of unofficial APIs being taken down, we decided to keep the codebase confidential, however the API endpoints are still being used in Kaizen</p>
 
 <h2 align="center"> Contributors </h2>
 <div align="center">
