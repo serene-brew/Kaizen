@@ -1,7 +1,6 @@
 <div align="center">
 
-# Kaizen
-## Coming out tomorrow
+# Kaizen v1.0.0
 </div>
 <div align="center">
 
@@ -91,17 +90,19 @@ kaizen -uninstall
 </td></tr> 
 </table>
 
-<h2> Known issues </h2>
-<p>This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor.</p>
-
-
-<img src="./assets/kaizen_issue_solved.gif">
+> [!NOTE]
+> <h2> Known issues </h2>
+> <p>This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor.</p>
+> <img src="./assets/kaizen_issue_solved.gif">
 
 <br/>
 
-<h2> Info about the API and the Backend </h2>
+> [!IMPORTANT]
+> <h2> Info about the API and the Backend </h2>
+> <p>The API is Home grown by Serene Brew and due to the current circumstances of unofficial APIs being taken down, we decided to keep the codebase confidential, however the API endpoints are still being used in Kaizen</p>
 
-<p>The API is Home grown by Serene Brew and due to the current circumstances of unofficial APIs being taken down, we decided to keep the codebase confidential, however the API endpoints are still being used in Kaizen</p>
+
+
 
 <h2 align="center"> Contributors </h2>
 <div align="center">
