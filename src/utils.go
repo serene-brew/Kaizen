@@ -35,8 +35,8 @@ It extracts the selected episode number, determines the streaming link using get
 and invokes the MPV media player to play the episode in full-screen mode.
 */
 func (m *Tab1Model) streamSubAnime() {
-	SubEpisodeString := fmt.Sprint("%s", m.listOne.SelectedItem())
-	SubEpisodeString = SubEpisodeString[10:14]
+	SubEpisodeString := fmt.Sprintf("%s", m.listOne.SelectedItem()) //nolint:govet // Ignore the warning for this line
+	SubEpisodeString = SubEpisodeString[8:12]
 	SubEpisodeString = strings.ReplaceAll(SubEpisodeString, " ", "")
 	m.subSelectedNum = SubEpisodeString
 	m.episodeType = "sub"
@@ -46,7 +46,7 @@ func (m *Tab1Model) streamSubAnime() {
 		stream := exec.Command("mpv", "-fs", m.streamLink)
 		stream.Output()
 	} else {
-		fmt.Sprintf("no link found")
+		fmt.Println("no link found")
 	}
 }
 
@@ -56,18 +56,18 @@ It operates similarly to streamSubAnime, but it sets the episode type to "dub"
 and fetches the streaming link accordingly before playing the episode with MPV.
 */
 func (m *Tab1Model) streamDubAnime() {
-	SubEpisodeString := fmt.Sprint("%s", m.listTwo.SelectedItem())
-	SubEpisodeString = SubEpisodeString[10:14]
-	SubEpisodeString = strings.ReplaceAll(SubEpisodeString, " ", "")
-	m.subSelectedNum = SubEpisodeString
+	DubEpisodeString := fmt.Sprintf("%s",m.listTwo.SelectedItem()) //nolint:govet // Ignore the warning for this line
+	DubEpisodeString = DubEpisodeString[8:12]
+	DubEpisodeString = strings.ReplaceAll(DubEpisodeString, " ", "")
+	m.dubSelectedNum = DubEpisodeString
 	m.episodeType = "dub"
-	link, _ := getStreamLink(m.animeID, m.episodeType, m.subSelectedNum)
+	link, _ := getStreamLink(m.animeID, m.episodeType, m.dubSelectedNum)
 	m.streamLink = link
 	if m.streamLink != "" {
 		stream := exec.Command("mpv", "-fs", m.streamLink)
 		stream.Output()
 	} else {
-		fmt.Sprintf("no link found")
+		fmt.Println("no link found")
 	}
 }
 
