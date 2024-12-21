@@ -1,4 +1,4 @@
-module tab
+module github.com/serene-brew/kaizen/src
 
 go 1.23.3
 
