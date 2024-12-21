@@ -10,10 +10,15 @@ import(
 )
 
 /*
-expandPath is a shared utility function that expands a given path starting with `~` to the full user home directory path.
-If the path does not start with `~`, it is returned unchanged.
-It uses the os.UserHomeDir function to obtain the home directory.
-*/
+ * expandPath
+ * -----------
+ * Parameters:
+ * - path: The file path to be expanded.
+ *
+ * Returns:
+ * - A string containing the expanded file path if applicable.
+ * - If the path doesn't start with `~`, the function returns the original path.
+ */
 
 
 func expandPath(path string) string {
@@ -41,6 +46,15 @@ func executeAppStub() {
 		fmt.Printf("Error starting app: %v\n", err)
 	}
 }
+
+/*
+ * runUpdateScript
+ * ---------------
+ * This function is responsible for executing a shell script that updates
+ * the application
+ * If the script fails to run, an error message is displayed on the terminal,
+ * and the program exits with a non-zero status.
+ */
 
 func runUpdateScript() {
 	script := expandPath("~/.local/kaizen/update.sh") 
