@@ -164,14 +164,17 @@ Please resize the window to either full screen or reduce the text size of the wi
 
 //Main entrypoint for the application
 func main() {
-	uninstallFlag := flag.Bool("uninstall", false, "Run the uninstaller script")
+	uninstalFlag := flag.Bool("uninstall", false, "Run the uninstaller script")
+	updateFlag := flag.Bool("update", false, "Run the update script")
 	versionFlag := flag.Bool("v", false, "views version information") 
 	flag.Parse()
 
-	if *uninstallFlag {
-		runUninstallScript()
+	if *uninstalFlag {
+		runUninstalScript()
 	} else if *versionFlag{
 		viewVersion()
+	}else if *updateFlag{
+		runUpdateScript()
 	}else{
 		executeAppStub()
 	}
