@@ -1,9 +1,8 @@
-package main
+package src
 
 import (
 	"fmt"
 	"strings"
-	"flag"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -158,25 +157,6 @@ Please resize the window to either full screen or reduce the text size of the wi
 	}
 	
 	return ""
-}
-
-
-//Main entrypoint for the application
-func main() {
-	uninstalFlag := flag.Bool("uninstall", false, "Run the uninstaller script")
-	updateFlag := flag.Bool("update", false, "Run the update script")
-	versionFlag := flag.Bool("v", false, "views version information") 
-	flag.Parse()
-
-	if *uninstalFlag {
-		runUninstalScript()
-	} else if *versionFlag{
-		viewVersion()
-	}else if *updateFlag{
-		runUpdateScript()
-	}else{
-		executeAppStub()
-	}
 }
 
 		
