@@ -113,4 +113,51 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+
+func (m MainModel) View() string {
+	switch m.currentScreen{
+		case AppScreen:
+			var tabs []string
+			for i, name := range tabNames {
+				if i == m.currentTab {
+					tabs = append(tabs, m.styles.ActiveTab.Render(name))
+				} else {
+					tabs = append(tabs, m.styles.Tab.Render(name))
+				}
+			}
+
+		tabsRow := gloss.JoinHorizontal(gloss.Top, tabs...)
+    	tabsRow = gloss.JoinHorizontal(gloss.Bottom, tabsRow, gloss.NewStyle().Foreground(DefaultActiveTabIndicatorColor).Render(strings.Repeat("─", m.width)))
+		content := ""
+		switch m.currentTab {
+		case 0:
+			m.tab1.width = m.width
+			m.tab1.focus = inputFocus
+			content = m.tab1.View()
+		case 1:
+			content = m.tab2.View()
+		}
+
+		return gloss.JoinVertical(gloss.Top, tabsRow, content)
+		
+		case ErrorScreen:
+			return centerStyle.Render(`Minimum window size is not met.
+minimum size = 100x40, current size = ` + fmt.Sprintf("%dx%d", m.width, m.height) + `
+Please resize the window to either full screen or reduce the text size of the window`)
+	}
+	
+	return ""
+}
+
+func main() {
+	runShell := flag.Bool("u", false, "Run the shell script")
+	flag.Parse()
+
+	if *runShell {
+		runUpdateScript()
+	} else {
+		executeAppStub()
+	}
+}
+
 		
