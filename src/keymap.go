@@ -4,13 +4,13 @@ import "github.com/charmbracelet/bubbles/key"
 
 //pre-defined keymaps for the TUI
 type keyMap struct {
+	Esc   key.Binding
+	Tab   key.Binding
 	List1  key.Binding
 	List2 key.Binding
 	Table key.Binding
 	Enter key.Binding
 	Input key.Binding
-	Esc   key.Binding
-	Tab   key.Binding
 	CtrlTab key.Binding
 }
 
