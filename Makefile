@@ -1,6 +1,6 @@
 # Variables
 APP_NAME := kaizen
-GO_FILES := ./src/$(wildcard *.go)
+GO_FILES := $(wildcard *.go)
 BUILD_DIR := build
 
 # Default target
