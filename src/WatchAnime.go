@@ -124,4 +124,120 @@ func NewTab1Model() Tab1Model {
 	}
 }
 
+func (m Tab1Model) Init() tea.Cmd {
+	return nil
+}
 
+func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
+	if m.focus == inputFocus{
+		m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+	}
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, keys.List1):
+			m.focus = listOneFocus
+			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
+			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			return m, nil
+		case key.Matches(msg, keys.List2):
+			m.focus = listTwoFocus
+			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
+			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			return m, nil
+		case key.Matches(msg, keys.Table):
+			m.focus = tableFocus
+			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+			return m, nil
+
+		case key.Matches(msg, keys.Input):
+			m.focus = inputFocus
+			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			return m, nil
+		case key.Matches(msg, keys.Enter):
+			if m.focus == inputFocus {
+				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+	
+			} else if m.focus == tableFocus{
+				if len(m.table.Rows()) != 0{
+					idx,_ := strconv.Atoi(m.table.SelectedRow()[0])
+					m.animeID = m.data[idx-1][0].(string)
+					m.animeName = m.table.SelectedRow()[1]
+					m.subEpisodeNumber,_ = strconv.Atoi(m.table.SelectedRow()[2])
+					m.dubEpisodeNumber,_ = strconv.Atoi(m.table.SelectedRow()[3]) 
+					m.focus = listOneFocus
+					if m.dubEpisodeNumber != 0{
+						m.listOne.SetItems(m.generateSubEpisodes(m.subEpisodeNumber))
+						m.listTwo.SetItems(m.generateSubEpisodes(m.dubEpisodeNumber))
+						m.listOne.SetShowStatusBar(true)
+						m.listTwo.SetShowStatusBar(true)
+					} else {
+						m.listOne.SetItems(m.generateSubEpisodes(m.subEpisodeNumber))
+						m.listTwo.SetItems([]list.Item{item{title:"                         ", style:"none"}})
+						m.listOne.SetShowStatusBar(true)
+						m.listTwo.SetShowStatusBar(false)
+					}
+					
+								
+					m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
+					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				} else {
+					m.focus = inputFocus
+					m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+					m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				}
+				
+			} else if m.focus == listOneFocus {	
+				m.streamSubAnime()
+				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
+				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			} else {
+				m.streamDubAnime()
+				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
+				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			}
+		return m, nil
+		}	
+
+	}
+
+
+	var cmd tea.Cmd
+	var cmds []tea.Cmd
+	if m.focus == inputFocus {
+		m.inputM, cmd = m.inputM.Update(msg)
+		cmds = append(cmds, cmd)
+	} else if m.focus == listOneFocus {
+		m.listOne, cmd = m.listOne.Update(msg)
+		cmds = append(cmds, cmd)
+	} else if m.focus == tableFocus{
+		m.table, cmd = m.table.Update(msg)
+		cmds = append(cmds, cmd)
+	}else{
+		m.listTwo, cmd = m.listTwo.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+
+	return m, tea.Batch(cmds...)
+}
