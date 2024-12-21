@@ -12,6 +12,7 @@
 [![forks](https://img.shields.io/github/forks/serene-brew/kaizen?style=social)](https://github.com/serene-brew/kaizen/network/members)
 [![issues](https://img.shields.io/github/issues/serene-brew/kaizen?style=social&logo=github)](https://github.com/serene-brew/kaizen/issues?q=is%3Aissue+is%3Aopen+)
 [![version](https://img.shields.io/github/v/release/serene-brew/kaizen?display_name=release&style=social&logo=github)](https://github.com/serene-brew/kaizen/releases/latest)
+[![go_reportcard](https://img.shields.io/badge/go%20report-A+-brightgreen.svg?style=social)](https://goreportcard.com/report/github.com/serene-brew/kaizen)
 </div>
 
 ## Why Watch Anime Like a Normie?
