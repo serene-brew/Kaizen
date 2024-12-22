@@ -94,7 +94,8 @@ kaizen -uninstall
 > [!NOTE]
 > <h2> Known issues </h2>
 > <p>This is a TUI which requires a very specific kind of display size, so either fire up Kaizen in full screen terminal or decrease the size of terminal like show below if you have a very small resolution monitor.</p>
-> <img src="./assets/kaizen_issue_solved.gif">
+![kaizen_issue_solved](https://github.com/user-attachments/assets/9bad59ea-fb5c-4b00-97f5-17df9e2cd142)
+
 
 <br/>
 
