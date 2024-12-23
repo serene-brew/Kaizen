@@ -27,7 +27,7 @@ So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode.
 
 https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 
-<h2> Installation </h2>
+## Installation, Update & Uninstallation
 
 1. Clone the Repository
 ```bash
@@ -41,13 +41,13 @@ chmod +x ./install.sh
 ./install.sh
 ```
 
-<h2> View Version Info </h2>
+### View Version Info
 
 ```bash
 kaizen -v
 ```
 
-<h2> Update and Uninstallation </h2>
+### Update and Uninstallation
 
 To update
 
@@ -59,7 +59,8 @@ To uninstall
 ```bash
 kaizen -uninstall
 ```
-
+## Configuration
+Once Kaizen is installed, you can find `config.yaml` file in your `~/.config/kaizen` directory. If it is not present, then copy the `config.yaml` into `~/.config/kaizen` directory. That file contains some default colors for kaizen, however you can modify it according to your own needs. 
 
 <h2 align="center"> Keybinds </h2>
 
