@@ -1,6 +1,6 @@
 <div align="center">
 
-# Kaizen v1.0.2
+# Kaizen v1.0.3
 </div>
 <div align="center">
 
@@ -111,4 +111,6 @@ kaizen -uninstall
   
 <a href="https://github.com/mintRaven-05"><img src="https://github.com/user-attachments/assets/2a8d88d5-58a7-43ed-ab2e-d8896c272904" height=70 width=70)></a>
 <a href="https://github.com/ImonChakraborty"><img src="https://github.com/user-attachments/assets/50c4e290-6ec7-4390-bc76-51c0e9ea1cae" height=70 width=70></a>
+<a href="https://github.com/noornee"><img src="https://github.com/user-attachments/assets/d60edfc5-873e-4fdb-93bd-3b289ddd1693" height=70 width=70></a>
+
 </div>
