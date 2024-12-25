@@ -42,16 +42,16 @@ sleep 1
 
 # Create necessary directories
 echo -e "${BLUE}[+] Creating directories...${NC}"
-mkdir -p ~/.local/kaizen
+mkdir -p ~/.local/share/kaizen
 mkdir -p ~/.config/kaizen
 echo -e "${GREEN}[✓] Directories created${NC}"
 sleep 1
 
 # Copy and set permissions for maintenance scripts
 echo -e "${BLUE}[+] Setting up maintenance scripts...${NC}"
-cp update.sh uninstall.sh ~/.local/kaizen/
-chmod +x ~/.local/kaizen/update.sh
-chmod +x ~/.local/kaizen/uninstall.sh
+cp update.sh uninstall.sh ~/.local/share/kaizen/
+chmod +x ~/.local/share/kaizen/update.sh
+chmod +x ~/.local/share/kaizen/uninstall.sh
 echo -e "${GREEN}[✓] Maintenance scripts configured${NC}"
 sleep 1
 
@@ -72,7 +72,7 @@ echo -e "${GREEN}[✓] Kaizen installed${NC}"
 sleep 1
 
 # Copy version file
-cp VERSION ~/.local/kaizen/
+cp VERSION ~/.local/share/kaizen/
 sleep 1
 
 # Clean up build directory
