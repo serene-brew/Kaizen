@@ -7,7 +7,7 @@ YELLOW='\033[0;33m'
 NC='\033[0m'
 
 
-if [[ "$(grep "VERSION" ~/.local/kaizen/VERSION | cut -c 10-)" == "$(curl -s https://api.github.com/repos/serene-brew/Kaizen/releases/latest | grep tag_name | cut -c 16-21)" ]]; then
+if [[ "$(grep "VERSION" ~/.local/share/kaizen/VERSION | cut -c 10-)" == "$(curl -s https://api.github.com/repos/serene-brew/Kaizen/releases/latest | grep tag_name | cut -c 16-21)" ]]; then
   echo -e "${GREEN}[+] no updates released !${NC}"
 else
     echo -e "${YELLOW}[!]A new version of kaizen is released${NC}"
@@ -41,7 +41,7 @@ else
             
       sleep .3
 
-      ~/.local/kaizen/uninstall.sh
+      ~/.local/share/kaizen/uninstall.sh
 
       sleep 2
       clear
