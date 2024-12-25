@@ -44,7 +44,8 @@ func (m *Tab1Model) streamSubAnime() {
 	link, _ := getStreamLink(m.animeID, m.episodeType, m.subSelectedNum)
 	m.streamLink = link
 	if m.streamLink != "" {
-		stream := exec.Command("mpv", "-fs", m.streamLink)
+		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (SUB)", m.animeName, m.subSelectedNum)
+		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
 		stream.Output()
 	} else {
 		fmt.Println("no link found")
@@ -65,7 +66,8 @@ func (m *Tab1Model) streamDubAnime() {
 	link, _ := getStreamLink(m.animeID, m.episodeType, m.dubSelectedNum)
 	m.streamLink = link
 	if m.streamLink != "" {
-		stream := exec.Command("mpv", "-fs", m.streamLink)
+		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (DUB)", m.animeName, m.dubSelectedNum)
+		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
 		stream.Output()
 	} else {
 		fmt.Println("no link found")
@@ -76,10 +78,11 @@ func (m *Tab1Model) streamDubAnime() {
 generateSubEpisodes is a method of Tab1Model that generates a list of items representing subbed episodes.
 It creates a list of episodes from 1 to the given number, formatted with default styles.
 */
-func (m *Tab1Model) generateSubEpisodes(num int) []list.Item {
+func (m *Tab1Model) generateSubEpisodes() []list.Item {
+	availableSubEpisodes := m.availableSubEpisodes
 	items := []list.Item{}
-	for i := 1; i <= num; i++ {
-		items = append(items, item{title: "Episode " + strconv.Itoa(i) + "               ", style: "default"})
+	for _,episode := range availableSubEpisodes {
+		items = append(items, item{title: "Episode " + episode + "               ", style: "default"})
 	}
 	return items
 }
@@ -88,10 +91,11 @@ func (m *Tab1Model) generateSubEpisodes(num int) []list.Item {
 generateDubEpisodes is a method of Tab1Model that generates a list of items representing dubbed episodes.
 Like generateSubEpisodes, it creates a list of episodes from 1 to the given number, formatted with default styles.
 */
-func (m *Tab1Model) generateDubEpisodes(num int) []list.Item {
+func (m *Tab1Model) generateDubEpisodes() []list.Item {
+	availableDubEpisodes := m.availableDubEpisodes
 	items := []list.Item{}
-	for i := 1; i <= num; i++ {
-		items = append(items, item{title: "Episode " + strconv.Itoa(i) + "               ", style: "default"})
+	for _,episode := range availableDubEpisodes {
+		items = append(items, item{title: "Episode " + episode + "               ", style: "default"})
 	}
 	return items
 }
