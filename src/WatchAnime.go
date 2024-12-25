@@ -217,7 +217,7 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 
 					if m.dubEpisodeNumber != 0 {
 						m.listOne.SetItems(m.generateSubEpisodes())
-						m.listTwo.SetItems(m.generateSubEpisodes())
+						m.listTwo.SetItems(m.generateDubEpisodes())
 						m.listOne.SetShowStatusBar(true)
 						m.listTwo.SetShowStatusBar(true)
 					} else {
