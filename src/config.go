@@ -1,12 +1,12 @@
 package src
 
 import (
-	"os"
-	"os/exec"
 	"fmt"
 	"github.com/spf13/viper"
-	"time"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 /* Config struct defines the color configuration for different elements of the application.

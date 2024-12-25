@@ -81,7 +81,7 @@ It creates a list of episodes from 1 to the given number, formatted with default
 func (m *Tab1Model) generateSubEpisodes() []list.Item {
 	availableSubEpisodes := m.availableSubEpisodes
 	items := []list.Item{}
-	for _,episode := range availableSubEpisodes {
+	for _, episode := range availableSubEpisodes {
 		items = append(items, item{title: "Episode " + episode + "               ", style: "default"})
 	}
 	return items
@@ -94,7 +94,7 @@ Like generateSubEpisodes, it creates a list of episodes from 1 to the given numb
 func (m *Tab1Model) generateDubEpisodes() []list.Item {
 	availableDubEpisodes := m.availableDubEpisodes
 	items := []list.Item{}
-	for _,episode := range availableDubEpisodes {
+	for _, episode := range availableDubEpisodes {
 		items = append(items, item{title: "Episode " + episode + "               ", style: "default"})
 	}
 	return items

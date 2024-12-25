@@ -35,14 +35,14 @@ type Tab1Model struct {
 	width  int
 	height int
 
-	animeID          string
-	animeName        string
-	subEpisodeNumber int
-	dubEpisodeNumber int
-	subSelectedNum   string
-	dubSelectedNum   string
-	episodeType      string
-	streamLink       string
+	animeID              string
+	animeName            string
+	subEpisodeNumber     int
+	dubEpisodeNumber     int
+	subSelectedNum       string
+	dubSelectedNum       string
+	episodeType          string
+	streamLink           string
 	availableSubEpisodes []string
 	availableDubEpisodes []string
 }
@@ -121,16 +121,16 @@ func NewTab1Model() Tab1Model {
 	styles := Tab1Styles()
 
 	return Tab1Model{
-		inputM:     input,
-		listOne:    list1,
-		listTwo:    list2,
-		styles:     styles,
-		focus:      inputFocus,
-		table:      SearchResults,
-		spinner:    spin,
-		data:       [][]interface{}{},
-		loading:    false,
-		loadingMSG: "Searching for results...",
+		inputM:               input,
+		listOne:              list1,
+		listTwo:              list2,
+		styles:               styles,
+		focus:                inputFocus,
+		table:                SearchResults,
+		spinner:              spin,
+		data:                 [][]interface{}{},
+		loading:              false,
+		loadingMSG:           "Searching for results...",
 		availableSubEpisodes: []string{},
 		availableDubEpisodes: []string{},
 	}

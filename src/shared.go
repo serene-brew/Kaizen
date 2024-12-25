@@ -3,9 +3,9 @@ package src
 import (
 	"fmt"
 	"os"
-	"time"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

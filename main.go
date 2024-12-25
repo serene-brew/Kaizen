@@ -1,17 +1,17 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"flag"
+	"fmt"
 	kaizen "github.com/serene-brew/Kaizen/src"
+	"os"
 )
 
 // Main entrypoint for the application
 func main() {
 	//perform auto-heal check before starting kaizen
 	kaizen.AutoHeal()
-	
+
 	//check whether MPV-player is installed or not
 	_, err := os.Stat("/usr/bin/mpv")
 	if err != nil {
