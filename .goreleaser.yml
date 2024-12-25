@@ -11,6 +11,9 @@ builds:
       - 386     # 32-bit
       - arm     # ARM (32-bit)
       - arm64   # ARM (64-bit)
+
+    binary: kaizen
+
 archives:
   - format: tar.gz
     name_template: >-
