@@ -1,9 +1,11 @@
 package src
 
 import (
+	"os"
+	"os/exec"
 	"fmt"
 	"github.com/spf13/viper"
-	"log"
+	"time"
 	"path/filepath"
 )
 
@@ -39,7 +41,30 @@ func LoadConfig() Config {
 	viper.SetConfigFile(filepath.Join(configPath, "config.yaml"))
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal error config file: %s \n", err))
+		fmt.Println("\033[0;33m [!] Invoking Auto-Heal  \033[0m")
+		time.Sleep(2 * time.Second)
+		fmt.Println("\033[0;33m [!] Fatal Error: config.yaml not found at ~/.config/kaizen/ \033[0m")
+		confDir := ExpandPath("~/.config/kaizen/")
+		if _, err := os.Stat(confDir); os.IsNotExist(err) {
+			cmd := exec.Command("mkdir", "-p", confDir)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if err := cmd.Run(); err != nil {
+				fmt.Fprintf(os.Stderr, "\033[0;31m [!] Error running shell script: %v \033[0m \n", err)
+				os.Exit(1)
+			}
+		}
+
+		confDownloadCmd := exec.Command("curl", "https://raw.githubusercontent.com/serene-brew/Kaizen/main/config.yaml", "-o", filepath.Join(confDir, "config.yaml"))
+		confDownloadCmd.Stdout = os.Stdout
+		confDownloadCmd.Stderr = os.Stderr
+
+		if err := confDownloadCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "\033[0;31m [!] Error running shell script: %v \033[0m \n", err)
+			os.Exit(1)
+		}
+		AutoHeal()
+		os.Exit(0)
 	}
 
 	var conf Config
