@@ -2,11 +2,12 @@ package src
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 /* Config struct defines the color configuration for different elements of the application.
@@ -14,20 +15,20 @@ import (
  * for Tab1 such as focus state, table selection, spinner, and ASCII art colors.*/
 
 type Config struct {
-	defaultForeground_light string
-	defaultForeground_dark  string
-	defaultUnfocused_light  string
-	defaultUnfocused_dark   string
-	defaultActiveTab_light  string
-	defaultActiveTab_dark   string
+	defaultForegroundLight string
+	defaultForegroundDark  string
+	defaultUnfocusedLight  string
+	defaultUnfocusedDark   string
+	defaultActiveTabLight  string
+	defaultActiveTabDark   string
 
-	Tab1_FocusActive             string
-	Tab1_FocusInactive           string
-	Tab1_TableSelectedBackground string
-	Tab1_TableSelectedForeground string
-	Tab1_SpinnerColor            string
-	Tab1_SpinnerMsgColor         string
-	Tab1_kaizen_AscciArtColor    string
+	Tab1FocusActive             string
+	Tab1FocusInactive           string
+	Tab1TableSelectedBackground string
+	Tab1TableSelectedForeground string
+	Tab1SpinnerColor            string
+	Tab1SpinnerMsgColor         string
+	Tab1KaizenAscciArtColor     string
 }
 
 /* LoadConfig function initializes the Config struct by reading values from a YAML configuration file.
@@ -69,35 +70,35 @@ func LoadConfig() Config {
 
 	var conf Config
 
-	defaultForeground_dark := viper.GetString("DefaultForeground.dark")
-	defaultForeground_light := viper.GetString("DefaultForeground.light")
-	defaultUnfocused_light := viper.GetString("DefaultUnfocused.light")
-	defaultUnfocused_dark := viper.GetString("DefaultUnfocused.dark")
-	defaultActiveTab_light := viper.GetString("DefaultActiveTab.light")
-	defaultActiveTab_dark := viper.GetString("DefaultActiveTab.dark")
+	defaultForegroundDark := viper.GetString("DefaultForeground.dark")
+	defaultForegroundLight := viper.GetString("DefaultForeground.light")
+	defaultUnfocusedLight := viper.GetString("DefaultUnfocused.light")
+	defaultUnfocusedDark := viper.GetString("DefaultUnfocused.dark")
+	defaultActiveTabLight := viper.GetString("DefaultActiveTab.light")
+	defaultActiveTabDark := viper.GetString("DefaultActiveTab.dark")
 
-	Tab1_FocusActive := viper.GetString("Tab1.focus.active")
-	Tab1_FocusInactive := viper.GetString("Tab1.focus.inactive")
-	Tab1_TableSelectedForeground := viper.GetString("Tab1.table.selected.foreground")
-	Tab1_TableSelectedBackground := viper.GetString("Tab1.table.selected.background")
-	Tab1_SpinnerColor := viper.GetString("Tab1.spinner.color")
-	Tab1_SpinnerMsgColor := viper.GetString("Tab1.spinner.msg.color")
-	Tab1_kaizen_AscciArtColor := viper.GetString("Tab1.ASCII Art.color")
+	Tab1FocusActive := viper.GetString("Tab1.focus.active")
+	Tab1FocusInactive := viper.GetString("Tab1.focus.inactive")
+	Tab1TableSelectedForeground := viper.GetString("Tab1.table.selected.foreground")
+	Tab1TableSelectedBackground := viper.GetString("Tab1.table.selected.background")
+	Tab1SpinnerColor := viper.GetString("Tab1.spinner.color")
+	Tab1SpinnerMsgColor := viper.GetString("Tab1.spinner.msg.color")
+	Tab1KaizenAscciArtColor := viper.GetString("Tab1.ASCII Art.color")
 
-	conf.defaultUnfocused_dark = defaultUnfocused_dark
-	conf.defaultUnfocused_light = defaultUnfocused_light
-	conf.defaultForeground_light = defaultForeground_light
-	conf.defaultForeground_dark = defaultForeground_dark
-	conf.defaultActiveTab_light = defaultActiveTab_light
-	conf.defaultActiveTab_dark = defaultActiveTab_dark
+	conf.defaultUnfocusedDark = defaultUnfocusedDark
+	conf.defaultUnfocusedLight = defaultUnfocusedLight
+	conf.defaultForegroundLight = defaultForegroundLight
+	conf.defaultForegroundDark = defaultForegroundDark
+	conf.defaultActiveTabLight = defaultActiveTabLight
+	conf.defaultActiveTabDark = defaultActiveTabDark
 
-	conf.Tab1_FocusActive = Tab1_FocusActive
-	conf.Tab1_FocusInactive = Tab1_FocusInactive
-	conf.Tab1_TableSelectedForeground = Tab1_TableSelectedForeground
-	conf.Tab1_TableSelectedBackground = Tab1_TableSelectedBackground
-	conf.Tab1_SpinnerColor = Tab1_SpinnerColor
-	conf.Tab1_SpinnerMsgColor = Tab1_SpinnerMsgColor
-	conf.Tab1_kaizen_AscciArtColor = Tab1_kaizen_AscciArtColor
+	conf.Tab1FocusActive = Tab1FocusActive
+	conf.Tab1FocusInactive = Tab1FocusInactive
+	conf.Tab1TableSelectedForeground = Tab1TableSelectedForeground
+	conf.Tab1TableSelectedBackground = Tab1TableSelectedBackground
+	conf.Tab1SpinnerColor = Tab1SpinnerColor
+	conf.Tab1SpinnerMsgColor = Tab1SpinnerMsgColor
+	conf.Tab1KaizenAscciArtColor = Tab1KaizenAscciArtColor
 
 	return conf
 }

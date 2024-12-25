@@ -46,7 +46,7 @@ func (m *Tab1Model) streamSubAnime() {
 	if m.streamLink != "" {
 		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (SUB)", m.animeName, m.subSelectedNum)
 		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
-		stream.Output()
+		stream.Output() //nolint:errcheck
 	} else {
 		fmt.Println("no link found")
 	}
@@ -68,7 +68,7 @@ func (m *Tab1Model) streamDubAnime() {
 	if m.streamLink != "" {
 		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (DUB)", m.animeName, m.dubSelectedNum)
 		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
-		stream.Output()
+		stream.Output() //nolint:errcheck
 	} else {
 		fmt.Println("no link found")
 	}

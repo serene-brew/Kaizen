@@ -95,9 +95,9 @@ If an error occurs at any point, it is returned along with an empty string.
 resp -> string [Stream link]
 */
 func getStreamLink(id string, espisodeType string, episodeNumber string) (string, error) {
-	apiUrl := "https://heavenscape.vercel.app/api/anime/search/" + id + "/" + espisodeType + "/" + episodeNumber
+	apiURL := "https://heavenscape.vercel.app/api/anime/search/" + id + "/" + espisodeType + "/" + episodeNumber
 
-	resp, err := http.Get(apiUrl)
+	resp, err := http.Get(apiURL)
 	if err != nil {
 		return "", err
 	}
