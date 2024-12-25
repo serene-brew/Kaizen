@@ -153,6 +153,25 @@ func AutoHeal() {
 			os.Exit(1)
 		}
 
+		updateModCmd := exec.Command("chmod", "+x", filepath.Join(scriptDir, "update.sh"))
+		updateModCmd.Stdout = os.Stdout
+		updateModCmd.Stderr = os.Stderr
+
+		if err := updateModCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "\033[0;33m [!] Error running shell code: %v \033[0m \n", err)
+			os.Exit(1)
+		}
+
+		uninstallModCmd := exec.Command("chmod", "+x", filepath.Join(scriptDir, "uninstall.sh"))
+		uninstallModCmd.Stdout = os.Stdout
+		uninstallModCmd.Stderr = os.Stderr
+
+		if err := uninstallModCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "\033[0;33m [!] Error running shell code: %v \033[0m \n", err)
+			os.Exit(1)
+		}	
+		
+
 		time.Sleep(2 * time.Second)
 		fmt.Println("\033[0;32m [+] config.yaml configure at ~/.config/kaizen/ \033[0m")
 		fmt.Println("\033[0;32m [+] shell scripts downloaded and configured at ~/.local/share/kaizen/ \033[0m")
