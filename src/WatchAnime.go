@@ -1,6 +1,7 @@
 package src
 
 import (
+	"os"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -42,6 +43,8 @@ type Tab1Model struct {
 	dubSelectedNum   string
 	episodeType      string
 	streamLink       string
+	availableSubEpisodes []string
+	availableDubEpisodes []string
 }
 
 type item struct {
@@ -128,6 +131,8 @@ func NewTab1Model() Tab1Model {
 		data:       [][]interface{}{},
 		loading:    false,
 		loadingMSG: "Searching for results...",
+		availableSubEpisodes: []string{},
+		availableDubEpisodes: []string{},
 	}
 }
 
@@ -150,6 +155,12 @@ func (m Tab1Model) Init() tea.Cmd {
  */
 
 func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
+	defer func() {
+		if r := recover(); r != nil {
+			os.Exit(1)
+		}
+	}()
+
 	if m.focus == inputFocus {
 		m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 	}
@@ -201,13 +212,16 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 					m.subEpisodeNumber, _ = strconv.Atoi(m.table.SelectedRow()[2])
 					m.dubEpisodeNumber, _ = strconv.Atoi(m.table.SelectedRow()[3])
 					m.focus = listOneFocus
+					m.availableSubEpisodes = m.data[idx-1][4].([]string)
+					m.availableDubEpisodes = m.data[idx-1][5].([]string)
+
 					if m.dubEpisodeNumber != 0 {
-						m.listOne.SetItems(m.generateSubEpisodes(m.subEpisodeNumber))
-						m.listTwo.SetItems(m.generateSubEpisodes(m.dubEpisodeNumber))
+						m.listOne.SetItems(m.generateSubEpisodes())
+						m.listTwo.SetItems(m.generateSubEpisodes())
 						m.listOne.SetShowStatusBar(true)
 						m.listTwo.SetShowStatusBar(true)
 					} else {
-						m.listOne.SetItems(m.generateSubEpisodes(m.subEpisodeNumber))
+						m.listOne.SetItems(m.generateSubEpisodes())
 						m.listTwo.SetItems([]list.Item{item{title: "                         ", style: "none"}})
 						m.listOne.SetShowStatusBar(true)
 						m.listTwo.SetShowStatusBar(false)
