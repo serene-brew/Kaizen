@@ -5,6 +5,7 @@ import (
 	"fmt"
 	kaizen "github.com/serene-brew/Kaizen/src"
 	"os"
+	"os/exec"
 )
 
 // Main entrypoint for the application
@@ -13,7 +14,7 @@ func main() {
 	kaizen.AutoHeal()
 
 	//check whether MPV-player is installed or not
-	_, err := os.Stat("/usr/bin/mpv")
+	_, err := exec.LookPath("mpv")
 	if err != nil {
 		fmt.Println("[!] Please install MPV-player using your package manager before running kaizen")
 		os.Exit(1)
