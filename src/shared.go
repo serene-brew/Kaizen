@@ -57,7 +57,7 @@ func ExecuteAppStub() {
  */
 
 func RunUpdateScript() {
-	script := ExpandPath("~/.local/kaizen/update.sh")
+	script := ExpandPath("~/.local/share/kaizen/update.sh")
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -77,7 +77,7 @@ func RunUpdateScript() {
  */
 
 func RunUninstalScript() {
-	script := ExpandPath("~/.local/kaizen/uninstall.sh")
+	script := ExpandPath("~/.local/share/kaizen/uninstall.sh")
 	cmd := exec.Command("sh", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -96,7 +96,7 @@ func RunUninstalScript() {
  * and the program exits with a non-zero status.
  */
 func ViewVersion() {
-	script := ExpandPath("~/.local/kaizen/VERSION")
+	script := ExpandPath("~/.local/share/kaizen/VERSION")
 	cmd := exec.Command("cat", script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -116,9 +116,9 @@ func ViewVersion() {
  * and the program exits with a non-zero status.
  */
 func AutoHeal() {
-	scriptDir := ExpandPath("~/.local/kaizen/")
+	scriptDir := ExpandPath("~/.local/share/kaizen/")
 	if _, err := os.Stat(scriptDir); os.IsNotExist(err) {
-		fmt.Println("\033[0;33m [!] Fatal Error: update.sh and uninstall.sh not found at ~/.local/kaizen/ \033[0m")
+		fmt.Println("\033[0;33m [!] Fatal Error: update.sh and uninstall.sh not found at ~/.local/share/kaizen/ \033[0m")
 		time.Sleep(2 * time.Second)
 		cmd := exec.Command("mkdir", "-p", scriptDir)
 		cmd.Stdout = os.Stdout
@@ -155,10 +155,10 @@ func AutoHeal() {
 
 		time.Sleep(2 * time.Second)
 		fmt.Println("\033[0;32m [+] config.yaml configure at ~/.config/kaizen/ \033[0m")
-		fmt.Println("\033[0;32m [+] shell scripts downloaded and configured at ~/.local/kaizen/ \033[0m")
-		fmt.Println("\033[0;32m        > update module downloaded and configured at ~/.local/kaizen/update.sh \033[0m")
-		fmt.Println("\033[0;32m        > uninstaller downloaded and configured at ~/.local/kaizen/uninstall.sh \033[0m")
-		fmt.Println("\033[0;32m [+] VERSION profile downloaded at ~/.local/kaizen/ \033[0m")
+		fmt.Println("\033[0;32m [+] shell scripts downloaded and configured at ~/.local/share/kaizen/ \033[0m")
+		fmt.Println("\033[0;32m        > update module downloaded and configured at ~/.local/share/kaizen/update.sh \033[0m")
+		fmt.Println("\033[0;32m        > uninstaller downloaded and configured at ~/.local/share/kaizen/uninstall.sh \033[0m")
+		fmt.Println("\033[0;32m [+] VERSION profile downloaded at ~/.local/share/kaizen/ \033[0m")
 		fmt.Println("\033[0;32m [+] You can now execute kaizen \033[0m")
 
 	}
