@@ -30,11 +30,11 @@ sleep .5
 
 echo -e "${BLUE}[+] Starting uninstaller... ${NC}"
 
-if [ -d "$HOME/.local/kaizen" ]; then
-  echo -e "${GREEN}[+]removing  $HOME/.local/kaizen ${NC}"
-  rm -rf ~/.local/kaizen 
+if [ -d "$HOME/.local/share/kaizen" ]; then
+  echo -e "${GREEN}[+]removing  $HOME/.local/share/kaizen ${NC}"
+  rm -rf ~/.local/share/kaizen 
 else
-  echo -e "${YELLOW}[!]could not locate $HOME/.local/kaizen ${NC}"
+  echo -e "${YELLOW}[!]could not locate $HOME/.local/share/kaizen ${NC}"
 fi
 
 if [ -f "/usr/bin/kaizen" ]; then
@@ -48,7 +48,7 @@ if [ -d "$HOME/.config/kaizen"  ]; then
   echo -e "${GREEN}[+]removing $HOME/.config/kaizen/config.yaml ${NC}"
   rm -rf ~/.config/kaizen
 else
-  echo -e "${YELLOW}[!]could not locate $HOME/.local/atlas ${NC}"
+  echo -e "${YELLOW}[!]could not locate $HOME/.config/kaizen ${NC}"
 fi
 
 sleep 1
