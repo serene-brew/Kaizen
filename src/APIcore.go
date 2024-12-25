@@ -3,6 +3,7 @@ package src
 import (
 	"encoding/json"
 	"io"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -12,8 +13,23 @@ AnimeResponse is a struct that represents the response format for anime search q
 It contains a single field, Result, which is a slice of slices containing interface{} elements.
 This is used to store the search results from the API response.
 */
+type Anime struct {
+	ID       string   `json:"id"`
+	Title    string   `json:"title"`
+	SubCount float64  `json:"subCount"`
+	DubCount float64  `json:"dubCount"`
+	Episodes Episodes `json:"episodes"`
+}
+
+// Episodes represents the subtitled and dubbed episode lists
+type Episodes struct {
+	Sub []string `json:"sub"`
+	Dub []string `json:"dub"`
+}
+
+// ApiResponse represents the overall API response structure
 type AnimeResponse struct {
-	Result [][]interface{} `json:"result"`
+	Result []Anime `json:"result"`
 }
 
 /*
@@ -30,29 +46,44 @@ The query string is used to build the API URL, and an HTTP GET request is sent t
 The function parses the JSON response and returns the Result field as a slice of slices of interface{}.
 If an error occurs at any stage, it is returned.
 
-resp -> string(animeID), string(animeName), int(subEpisodes), int(dubEpisodes) -> [][]interface{}
+resp -> string(animeID), string(animeName), float64(subEpisodes), float64(dubEpisodes) []string []string -> [][]interface{}
 */
 func extractInfo(query string) ([][]interface{}, error) {
-	apiUrl := "https://heavenscape.vercel.app/api/anime/search/" + strings.ReplaceAll(query, " ", "+")
-
-	resp, err := http.Get(apiUrl)
+	apiURL := "https://heavenscape.vercel.app/api/anime/search/" + strings.ReplaceAll(query, " ", "+")
+	resp, err := http.Get(apiURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error fetching data: %v", err)
 	}
 	defer resp.Body.Close()
 
+	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 
-	var response AnimeResponse
-	err = json.Unmarshal(body, &response)
+	// Parse the JSON response into ApiResponse struct
+	var apiResponse AnimeResponse
+	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing JSON: %v", err)
 	}
 
-	return response.Result, nil
+	// Process the data into [][]interface{}
+	var result [][]interface{}
+	for _, anime := range apiResponse.Result {
+		row := []interface{}{
+			anime.ID,
+			anime.Title,
+			anime.SubCount,
+			anime.DubCount,
+			anime.Episodes.Sub,
+			anime.Episodes.Dub,
+		}
+		result = append(result, row)
+	}
+
+	return result, nil
 }
 
 /*
