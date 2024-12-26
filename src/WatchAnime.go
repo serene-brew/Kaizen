@@ -18,34 +18,36 @@ var (
 	keys      = newKeyMap()
 )
 
-type focus int
-type Tab1Model struct {
-	focus   focus
-	styles  Tab1styles
-	inputM  textinput.Model
-	listOne list.Model
-	listTwo list.Model
-	table   table.Model
-	spinner spinner.Model
+type (
+	focus     int
+	Tab1Model struct {
+		focus   focus
+		styles  Tab1styles
+		inputM  textinput.Model
+		listOne list.Model
+		listTwo list.Model
+		table   table.Model
+		spinner spinner.Model
 
-	loading    bool
-	loadingMSG string
-	data       [][]interface{}
+		loading    bool
+		loadingMSG string
+		data       [][]interface{}
 
-	width  int
-	height int
+		width  int
+		height int //nolint:unused
 
-	animeID              string
-	animeName            string
-	subEpisodeNumber     int
-	dubEpisodeNumber     int
-	subSelectedNum       string
-	dubSelectedNum       string
-	episodeType          string
-	streamLink           string
-	availableSubEpisodes []string
-	availableDubEpisodes []string
-}
+		animeID              string
+		animeName            string
+		subEpisodeNumber     int
+		dubEpisodeNumber     int
+		subSelectedNum       string
+		dubSelectedNum       string
+		episodeType          string
+		streamLink           string
+		availableSubEpisodes []string
+		availableDubEpisodes []string
+	}
+)
 
 type item struct {
 	title string
@@ -86,7 +88,7 @@ func NewTab1Model() Tab1Model {
 
 	spin := spinner.New()
 	spin.Spinner = spinner.Dot
-	spin.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1_SpinnerColor))
+	spin.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1SpinnerColor))
 
 	columns := []table.Column{
 		{Title: "", Width: 10},
@@ -238,7 +240,6 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				}
-
 			} else if m.focus == listOneFocus {
 				m.streamSubAnime()
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
@@ -254,7 +255,6 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 			}
 			return m, nil
 		}
-
 	}
 
 	// Update the active component based on focus, and return a batch of commands
@@ -314,7 +314,7 @@ func (m Tab1Model) View() string {
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣾⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉`
-	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1_kaizen_AscciArtColor))
+	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
 	if m.loading {
 		return lipgloss.JoinVertical(
 			lipgloss.Top,
@@ -322,7 +322,7 @@ func (m Tab1Model) View() string {
 			lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				m.spinner.View(),
-				lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1_SpinnerMsgColor)).Render(m.loadingMSG)),
+				lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1SpinnerMsgColor)).Render(m.loadingMSG)),
 			tableS,
 			lipgloss.JoinHorizontal(
 				lipgloss.Top,

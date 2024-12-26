@@ -1,0 +1,18 @@
+name: Go Test Workflow
+
+on: [pull_request]
+
+jobs:
+  go-test-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Run go test
+        run: cd src && go test -v ./...

@@ -1,8 +1,9 @@
 package src
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
 	"testing"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func TestAppStateSimulation(t *testing.T) {

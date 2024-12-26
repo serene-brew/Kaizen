@@ -2,12 +2,13 @@ package src
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
-	"strings"
 )
 
 type AppState int
@@ -56,7 +57,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentScreen = AppScreen
 		}
 	case tea.KeyMsg:
-		//this switch handles when to show AppScreen and when to overlay the ErrorScreen over the AppScreen
+		// this switch handles when to show AppScreen and when to overlay the ErrorScreen over the AppScreen
 		switch m.currentScreen {
 		case AppScreen:
 			switch msg.String() {

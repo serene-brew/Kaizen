@@ -41,9 +41,9 @@ Default colors and borders are defined here as adaptive properties to support li
 These settings provide a cohesive appearance across different themes.
 */
 var (
-	DefaultForegroundColor         = gloss.AdaptiveColor{Light: conf.defaultUnfocused_light, Dark: conf.defaultForeground_dark}
-	DefaultUnfocusedColor          = gloss.AdaptiveColor{Light: conf.defaultUnfocused_light, Dark: conf.defaultUnfocused_dark}
-	DefaultActiveTabIndicatorColor = gloss.AdaptiveColor{Light: conf.defaultActiveTab_light, Dark: conf.defaultActiveTab_dark}
+	DefaultForegroundColor         = gloss.AdaptiveColor{Light: conf.defaultUnfocusedLight, Dark: conf.defaultForegroundDark}
+	DefaultUnfocusedColor          = gloss.AdaptiveColor{Light: conf.defaultUnfocusedLight, Dark: conf.defaultUnfocusedDark}
+	DefaultActiveTabIndicatorColor = gloss.AdaptiveColor{Light: conf.defaultActiveTabLight, Dark: conf.defaultActiveTabDark}
 
 	DefaultWindowBorder = gloss.Border{
 		Top:         " ",
@@ -83,7 +83,7 @@ var (
 		BottomRight: "┐",
 	}
 
-	thinRoundedBorder = gloss.Border{
+	thinRoundedBorder = gloss.Border{ //nolint:unused
 		Top:         "─",
 		Bottom:      "─",
 		Left:        "│",
@@ -94,19 +94,19 @@ var (
 		BottomRight: "╯",
 	}
 
-	tableStyle = gloss.NewStyle().
+	tableStyle = gloss.NewStyle(). //nolint:unused
 			Border(thinRoundedBorder).
 			BorderForeground(gloss.Color("63"))
 
-	headerStyle = gloss.NewStyle().
+	headerStyle = gloss.NewStyle(). //nolint:unused
 			Bold(true).
 			Foreground(gloss.Color("208"))
 
-	selectedStyle = gloss.NewStyle().
+	selectedStyle = gloss.NewStyle(). //nolint:unused
 			Foreground(gloss.Color("229")).
 			Background(gloss.Color("63"))
 
-	contentStyle = gloss.NewStyle().
+	contentStyle = gloss.NewStyle(). //nolint:unused
 			Border(DefaultWindowBorder, true).
 			BorderForeground(DefaultForegroundColor)
 
@@ -158,22 +158,22 @@ func Tab1Styles() Tab1styles {
 	return Tab1styles{
 		list1Border: gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
-			BorderForeground(gloss.Color(conf.Tab1_FocusInactive)).
+			BorderForeground(gloss.Color(conf.Tab1FocusInactive)).
 			Padding(1),
 		list2Border: gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
-			BorderForeground(gloss.Color(conf.Tab1_FocusInactive)).
+			BorderForeground(gloss.Color(conf.Tab1FocusInactive)).
 			Padding(1),
 		inputBorder: gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
-			BorderForeground(gloss.Color(conf.Tab1_FocusActive)).
+			BorderForeground(gloss.Color(conf.Tab1FocusActive)).
 			Padding(1),
 		tableBorder: gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
-			BorderForeground(gloss.Color(conf.Tab1_FocusInactive)).
+			BorderForeground(gloss.Color(conf.Tab1FocusInactive)).
 			Padding(1),
-		activeColor:   conf.Tab1_FocusActive,   // Orange
-		inactiveColor: conf.Tab1_FocusInactive, // Gray
+		activeColor:   conf.Tab1FocusActive,   // Orange
+		inactiveColor: conf.Tab1FocusInactive, // Gray
 	}
 }
 
@@ -190,8 +190,8 @@ func getTableStyles() table.Styles {
 		Bold(false)
 
 	s.Selected = s.Selected.
-		Foreground(gloss.Color(conf.Tab1_TableSelectedForeground)).
-		Background(gloss.Color(conf.Tab1_TableSelectedBackground)).
+		Foreground(gloss.Color(conf.Tab1TableSelectedForeground)).
+		Background(gloss.Color(conf.Tab1TableSelectedBackground)).
 		Bold(false)
 
 	return s

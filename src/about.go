@@ -15,7 +15,7 @@ func (m Tab2Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m Tab2Model) Update(msg tea.Msg) (Tab2Model, tea.Cmd) {
+func (m Tab2Model) Update(_ tea.Msg) (Tab2Model, tea.Cmd) {
 	// Tab2 doesn't react to input, just static content
 	return m, nil
 }
@@ -41,7 +41,7 @@ func (m Tab2Model) View() string {
 
 	link := lipgloss.NewStyle().Foreground(lipgloss.Color("#43BF6D")).Render
 
-	ui := lipgloss.JoinVertical(lipgloss.Center, lipgloss.NewStyle().Foreground(lipgloss.Color(conf.defaultActiveTab_dark)).Render("kaizen"))
+	ui := lipgloss.JoinVertical(lipgloss.Center, lipgloss.NewStyle().Foreground(lipgloss.Color(conf.defaultActiveTabDark)).Render("kaizen"))
 
 	desc := `Ever feel like your terminal was missing something? 
 Like, sure, it can handle your code, your servers, and maybe a cheeky game of Snake. 
@@ -60,28 +60,28 @@ Enjoy your experience, and let Kaizen be your companion on your journey into the
 		lipgloss.WithWhitespaceForeground(lipgloss.Color("#383838")),
 	)
 
-	mintRaven_github := link("https://github.com/mintRaven-05")
-	riserSama_github := link("https://github.com/ImonChakraborty")
-	sereneBrew_github := link("https://github.com/serene-brew")
-	dev_community := link("https://dev.to/serene-brew")
+	mintRavenGithub := link("https://github.com/mintRaven-05")
+	riserSamaGithub := link("https://github.com/ImonChakraborty")
+	sereneBrewGithub := link("https://github.com/serene-brew")
+	devCommunity := link("https://dev.to/serene-brew")
 
-	short_title1 := "Want to see more from us? Follow us on our socials.\n"
-	socials := "•" + mintRaven_github + "\n•" + riserSama_github + "\n"
-	socials_end := "(github is the only social life we have)\n"
-	socialsText := short_title1 + socials + socials_end
+	shortTitle1 := "Want to see more from us? Follow us on our socials.\n"
+	socials := "•" + mintRavenGithub + "\n•" + riserSamaGithub + "\n"
+	socialsEnd := "(github is the only social life we have)\n"
+	socialsText := shortTitle1 + socials + socialsEnd
 
-	short_title2 := "Check out the latest project from\n"
-	github := "•" + sereneBrew_github + "\n"
-	github_end := "Found a bug? Report at the project repository.\n\n"
-	serene_brew := short_title2 + github + github_end
+	shortTitle2 := "Check out the latest project from\n"
+	github := "•" + sereneBrewGithub + "\n"
+	githubEnd := "Found a bug? Report at the project repository.\n\n"
+	sereneBrew := shortTitle2 + github + githubEnd
 
-	short_title3 := "keep up with our latest posts and news at\n"
-	dev := "•" + dev_community + "\n"
-	dev_end := "(dev.to is another social life we have for now)\n\n"
-	dev_text := short_title3 + dev + dev_end
+	shortTitle3 := "keep up with our latest posts and news at\n"
+	dev := "•" + devCommunity + "\n"
+	devEnd := "(dev.to is another social life we have for now)\n\n"
+	devText := shortTitle3 + dev + devEnd
 
 	email := link("\t  serene.brew.git@gmail.com")
-	email_text := "\t  ~developed by mintRaven & RiserSama\n" + email
+	emailText := "\t  ~developed by mintRaven & RiserSama\n" + email
 
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
@@ -94,7 +94,7 @@ Enjoy your experience, and let Kaizen be your companion on your journey into the
 			LinksStyle.Render(socialsText),
 			lipgloss.JoinVertical(
 				lipgloss.Top,
-				LinksStyle.Render(serene_brew),
-				FooterStyle.Render(email_text)),
-			LinksStyle.Render(dev_text)))
+				LinksStyle.Render(sereneBrew),
+				FooterStyle.Render(emailText)),
+			LinksStyle.Render(devText)))
 }

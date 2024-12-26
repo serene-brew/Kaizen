@@ -169,8 +169,7 @@ func AutoHeal() {
 		if err := uninstallModCmd.Run(); err != nil {
 			fmt.Fprintf(os.Stderr, "\033[0;33m [!] Error running shell code: %v \033[0m \n", err)
 			os.Exit(1)
-		}	
-		
+		}
 
 		time.Sleep(2 * time.Second)
 		fmt.Println("\033[0;32m [+] config.yaml configure at ~/.config/kaizen/ \033[0m")
