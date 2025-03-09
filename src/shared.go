@@ -178,12 +178,6 @@ func AutoHeal() {
 		fmt.Println("\033[0;32m        > uninstaller downloaded and configured at ~/.local/share/kaizen/uninstall.sh \033[0m")
 		fmt.Println("\033[0;32m [+] VERSION profile downloaded at ~/.local/share/kaizen/ \033[0m")
 		fmt.Println("\033[0;32m [+] You can now execute kaizen \033[0m")
-		executeCmd := exec.Command("kaizen")
-		executeCmd.Stdout = os.Stdout
-		executeCmd.Stderr = os.Stderr
-		if err := executeCmd.Run(); err != nil {
-			fmt.Fprintf(os.Stderr, "\033[0;31m [!] Error executing kaizen: %v \033[0m \n", err)
-			os.Exit(1)
-		}
+
 	}
 }

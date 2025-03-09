@@ -64,6 +64,13 @@ func LoadConfig() Config {
 			os.Exit(1)
 		}
 		AutoHeal()
+		executeCmd := exec.Command("kaizen")
+		executeCmd.Stdout = os.Stdout
+		executeCmd.Stderr = os.Stderr
+		if err := executeCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "\033[0;31m [!] Error executing kaizen: %v \033[0m \n", err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 
