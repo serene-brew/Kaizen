@@ -28,7 +28,18 @@ So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode.
 https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 
 ## Installation, Update & Uninstallation
+>[!IMPORTANT]
+>### For Arch linux, we have released kaizen in AUR.<br>
+>To install it using `yay` use this command
+> ```bash
+> yay -S kaizen-git
+> ```
+> if you use `paru` then in that case
+>```bash
+>paru -S kaizen-git
+>```
 
+### For other linux distros
 1. Clone the Repository
 ```bash
 git clone https://github.com/serene-brew/Kaizen
