@@ -44,7 +44,7 @@ func LoadConfig() Config {
 	if err != nil {
 		fmt.Println("\033[0;33m [!] Invoking Auto-Heal  \033[0m")
 		time.Sleep(2 * time.Second)
-		fmt.Println("\033[0;33m [!] Fatal Error: config.yaml not found at ~/.config/kaizen/ \033[0m")
+		fmt.Println("\033[0;33m [+] Downloading config.yaml at ~/.config/kaizen/ \033[0m")
 		confDir := ExpandPath("~/.config/kaizen/")
 		if _, err := os.Stat(confDir); os.IsNotExist(err) {
 			cmd := exec.Command("mkdir", "-p", confDir)
@@ -59,7 +59,6 @@ func LoadConfig() Config {
 		confDownloadCmd := exec.Command("curl", "https://raw.githubusercontent.com/serene-brew/Kaizen/main/config.yaml", "-o", filepath.Join(confDir, "config.yaml"))
 		confDownloadCmd.Stdout = os.Stdout
 		confDownloadCmd.Stderr = os.Stderr
-
 		if err := confDownloadCmd.Run(); err != nil {
 			fmt.Fprintf(os.Stderr, "\033[0;31m [!] Error running shell script: %v \033[0m \n", err)
 			os.Exit(1)
