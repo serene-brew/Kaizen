@@ -32,11 +32,11 @@ https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
 >### For Arch linux, we have released kaizen in AUR.<br>
 >To install it using `yay` use this command
 > ```bash
-> yay -S kaizen-git
+> yay -S kaizen-bin
 > ```
 > if you use `paru` then in that case
 >```bash
->paru -S kaizen-git
+>paru -S kaizen-bin
 >```
 
 ### For other linux distros
