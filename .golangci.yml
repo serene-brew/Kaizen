@@ -50,15 +50,6 @@ linters:
       # Please comment the following line if your code is not using the godoc format
       - comments
 
-      # Common false positives
-      # feel free to remove this if you don't have any false positives
-      # More information: https://golangci-lint.run/usage/false-positives/#common-false-positives
-      - common-false-positives
-
-      # Legacy preset is not recommended anymore
-      # More information: https://golangci-lint.run/usage/false-positives/#legacy
-      - legacy
-
       # std-error-handling is a set of rules that avoid reporting unhandled errors on common functions/methods
       # More information: https://golangci-lint.run/usage/false-positives/#std-error-handling
       - std-error-handling
