@@ -16,7 +16,7 @@ generateRows is a method of Tab1Model that converts a two-dimensional slice of i
 Each row in the table is constructed by extracting and formatting specific fields from the input data.
 The rows are intended to be displayed in a tabular Bubble Tea model.
 */
-func (m *Tab1Model) generateRows(data [][]interface{}) []table.Row {
+func (m *Tab1Model) generateRows(data [][]any) []table.Row {
 	m.loading = false
 	rows := []table.Row{}
 	for i, item := range data {
