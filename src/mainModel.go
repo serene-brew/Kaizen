@@ -68,7 +68,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "esc":
 				return m, tea.Quit
 			}
-			if m.currentTab == 0 {
+			switch m.currentTab {
+			case 0:
 				switch {
 				case key.Matches(msg, keys.Enter):
 					if m.tab1.focus == inputFocus {
@@ -90,7 +91,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var cmd tea.Cmd
 				m.tab1, cmd = m.tab1.Update(msg)
 				return m, cmd
-			} else if m.currentTab == 1 {
+			case 1:
 				var cmd tea.Cmd
 				m.tab2, cmd = m.tab2.Update(msg)
 				return m, cmd
@@ -103,7 +104,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	// this case handels the table output generation for the collected anime list from the API
-	case [][]interface{}:
+	case [][]any:
 		m.tab1.data = msg
 		m.tab1.table.SetRows(m.tab1.generateRows(msg))
 		m.tab1.listOne.SetItems([]list.Item{item{title: "                         ", style: "none"}})

@@ -48,7 +48,7 @@ If an error occurs at any stage, it is returned.
 
 resp -> string(animeID), string(animeName), float64(subEpisodes), float64(dubEpisodes) []string []string -> [][]interface{}
 */
-func extractInfo(query string) ([][]interface{}, error) {
+func extractInfo(query string) ([][]any, error) {
 	apiURL := "https://heavenscape.vercel.app/api/anime/search/" + strings.ReplaceAll(query, " ", "+")
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -70,9 +70,9 @@ func extractInfo(query string) ([][]interface{}, error) {
 	}
 
 	// Process the data into [][]interface{}
-	var result [][]interface{}
+	var result [][]any
 	for _, anime := range apiResponse.Result {
-		row := []interface{}{
+		row := []any{
 			anime.ID,
 			anime.Title,
 			anime.SubCount,

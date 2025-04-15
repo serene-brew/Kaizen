@@ -31,7 +31,7 @@ type (
 
 		loading    bool
 		loadingMSG string
-		data       [][]interface{}
+		data       [][]any
 
 		width  int
 		height int //nolint:unused
@@ -130,7 +130,7 @@ func NewTab1Model() Tab1Model {
 		focus:                inputFocus,
 		table:                SearchResults,
 		spinner:              spin,
-		data:                 [][]interface{}{},
+		data:                 [][]any{},
 		loading:              false,
 		loadingMSG:           "Searching for results...",
 		availableSubEpisodes: []string{},
@@ -200,13 +200,14 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			return m, nil
 		case key.Matches(msg, keys.Enter):
-			if m.focus == inputFocus {
+			switch m.focus {
+			case inputFocus:
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 
-			} else if m.focus == tableFocus {
+			case tableFocus:
 				if len(m.table.Rows()) != 0 {
 					idx, _ := strconv.Atoi(m.table.SelectedRow()[0])
 					m.animeID = m.data[idx-1][0].(string)
@@ -240,13 +241,13 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				}
-			} else if m.focus == listOneFocus {
+			case listOneFocus:
 				m.streamSubAnime()
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
-			} else {
+			default:
 				m.streamDubAnime()
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
@@ -260,16 +261,17 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 	// Update the active component based on focus, and return a batch of commands
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
-	if m.focus == inputFocus {
+	switch m.focus {
+	case inputFocus:
 		m.inputM, cmd = m.inputM.Update(msg)
 		cmds = append(cmds, cmd)
-	} else if m.focus == listOneFocus {
+	case listOneFocus:
 		m.listOne, cmd = m.listOne.Update(msg)
 		cmds = append(cmds, cmd)
-	} else if m.focus == tableFocus {
+	case tableFocus:
 		m.table, cmd = m.table.Update(msg)
 		cmds = append(cmds, cmd)
-	} else {
+	default:
 		m.listTwo, cmd = m.listTwo.Update(msg)
 		cmds = append(cmds, cmd)
 	}
