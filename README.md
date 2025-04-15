@@ -116,13 +116,13 @@ Once Kaizen is installed, you can find `config.yaml` file in your `~/.config/kai
 > <p>The API is Home grown by Serene Brew and due to the current circumstances of unofficial APIs being taken down, we decided to keep the codebase confidential, however the API endpoints are still being used in Kaizen</p>
 
 
-
-
 <h2 align="center"> Contributors </h2>
 <div align="center">
   
 <a href="https://github.com/mintRaven-05"><img src="https://github.com/user-attachments/assets/2a8d88d5-58a7-43ed-ab2e-d8896c272904" height=70 width=70)></a>
 <a href="https://github.com/ImonChakraborty"><img src="https://github.com/user-attachments/assets/50c4e290-6ec7-4390-bc76-51c0e9ea1cae" height=70 width=70></a>
 <a href="https://github.com/noornee"><img src="https://github.com/user-attachments/assets/d60edfc5-873e-4fdb-93bd-3b289ddd1693" height=70 width=70></a>
+<a href="https://github.com/ccoVeille"><img src="https://github.com/user-attachments/assets/6774a17c-a289-4e96-aa73-b38eb146656e" height=70 width=70></a>
+
 
 </div>
