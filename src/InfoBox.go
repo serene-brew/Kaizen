@@ -1,0 +1,307 @@
+package src
+
+import (
+	"strings"
+
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+type InfoBoxKeyMap struct {
+	ScrollUp     key.Binding
+	ScrollDown   key.Binding
+	PageUp       key.Binding
+	PageDown     key.Binding
+	ScrollTop    key.Binding
+	ScrollBottom key.Binding
+}
+
+func DefaultInfoBoxKeyMap() InfoBoxKeyMap {
+	return InfoBoxKeyMap{
+		ScrollUp: key.NewBinding(
+			key.WithKeys("up", "k"),
+			key.WithHelp("↑/k", "scroll up"),
+		),
+		ScrollDown: key.NewBinding(
+			key.WithKeys("down", "j"),
+			key.WithHelp("↓/j", "scroll down"),
+		),
+		PageUp: key.NewBinding(
+			key.WithKeys("pgup", "b"),
+			key.WithHelp("pgup/b", "page up"),
+		),
+		PageDown: key.NewBinding(
+			key.WithKeys("pgdown", "f"),
+			key.WithHelp("pgdown/f", "page down"),
+		),
+		ScrollTop: key.NewBinding(
+			key.WithKeys("home", "g"),
+			key.WithHelp("home/g", "scroll to top"),
+		),
+		ScrollBottom: key.NewBinding(
+			key.WithKeys("end", "G"),
+			key.WithHelp("end/G", "scroll to bottom"),
+		),
+	}
+}
+
+type InfoBox struct {
+	width          int
+	height         int
+	title          string
+	englishName    string
+	description    string
+	genres         []string
+	status         string
+	animeType      string
+	rating         string
+	descViewport   viewport.Model
+	hasAnimeLoaded bool
+	styles         InfoBoxStyles
+	keyMap         InfoBoxKeyMap
+	focused        bool
+}
+
+type InfoBoxStyles struct {
+	border          lipgloss.Style
+	title           lipgloss.Style
+	label           lipgloss.Style
+	value           lipgloss.Style
+	descriptionBox  lipgloss.Style
+	viewportStyle   lipgloss.Style
+	scrollIndicator lipgloss.Style
+	activeColor     string
+	inactiveColor   string
+}
+
+func NewInfoBox() InfoBox {
+	vp := viewport.New(50, 10)
+	vp.SetContent("")
+	vp.MouseWheelEnabled = true
+
+	styles := InfoBoxStyles{
+		border: lipgloss.NewStyle().
+			PaddingLeft(1).
+			PaddingBottom(1).
+			PaddingTop(1).
+			PaddingRight(1),
+		title: lipgloss.NewStyle().
+			Bold(true).
+			MarginBottom(1),
+		label: lipgloss.NewStyle().
+			Bold(true),
+		value: lipgloss.NewStyle(),
+		descriptionBox: lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Padding(0, 1),
+		viewportStyle: lipgloss.NewStyle(),
+		scrollIndicator: lipgloss.NewStyle().
+			Foreground(lipgloss.Color("240")),
+		activeColor:   "62",
+		inactiveColor: "240",
+	}
+
+	return InfoBox{
+		width:          50,
+		height:         25,
+		hasAnimeLoaded: false,
+		descViewport:   vp,
+		styles:         styles,
+		keyMap:         DefaultInfoBoxKeyMap(),
+		focused:        false,
+	}
+}
+
+func (i *InfoBox) Focus() {
+	i.focused = true
+	i.styles.border = i.styles.border.BorderForeground(lipgloss.Color(i.styles.activeColor))
+	i.styles.descriptionBox = i.styles.descriptionBox.BorderForeground(lipgloss.Color(i.styles.activeColor))
+}
+
+func (i *InfoBox) Blur() {
+	i.focused = false
+	i.styles.border = i.styles.border.BorderForeground(lipgloss.Color(i.styles.inactiveColor))
+	i.styles.descriptionBox = i.styles.descriptionBox.BorderForeground(lipgloss.Color(i.styles.inactiveColor))
+}
+
+func (i *InfoBox) SetSize(width, height int) {
+	i.width = width
+	i.height = height
+
+	contentWidth := width - 4
+
+	i.styles.border = i.styles.border.Width(width).Height(height)
+
+	metadataHeight := 8
+	descHeight := height - metadataHeight - 4 + 3
+
+	if descHeight < 3 {
+		descHeight = 3
+	}
+
+	i.descViewport.Width = contentWidth - 2
+	i.descViewport.Height = descHeight
+
+	i.styles.descriptionBox = i.styles.descriptionBox.Width(contentWidth)
+}
+
+func (i *InfoBox) SetAnimeInfo(title, englishName, description string, genres []string, status, animeType, rating string) {
+	i.title = title
+	i.englishName = englishName
+	i.description = description
+	i.genres = genres
+	i.status = status
+	i.animeType = animeType
+	i.rating = rating
+	i.hasAnimeLoaded = true
+
+	i.descViewport.SetContent(description)
+	i.descViewport.GotoTop()
+}
+
+func (i *InfoBox) ScrollPercent() float64 {
+	return i.descViewport.ScrollPercent()
+}
+
+func (i *InfoBox) Update(msg tea.Msg) (InfoBox, tea.Cmd) {
+	var cmd tea.Cmd
+
+	if i.hasAnimeLoaded {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			if i.focused {
+				switch {
+				case key.Matches(msg, i.keyMap.ScrollUp):
+					i.descViewport.LineUp(1)
+					return *i, nil
+				case key.Matches(msg, i.keyMap.ScrollDown):
+					i.descViewport.LineDown(1)
+					return *i, nil
+				case key.Matches(msg, i.keyMap.PageUp):
+					i.descViewport.HalfViewUp()
+					return *i, nil
+				case key.Matches(msg, i.keyMap.PageDown):
+					i.descViewport.HalfViewDown()
+					return *i, nil
+				case key.Matches(msg, i.keyMap.ScrollTop):
+					i.descViewport.GotoTop()
+					return *i, nil
+				case key.Matches(msg, i.keyMap.ScrollBottom):
+					i.descViewport.GotoBottom()
+					return *i, nil
+				}
+			}
+		}
+
+		i.descViewport, cmd = i.descViewport.Update(msg)
+	}
+
+	return *i, cmd
+}
+
+func (i *InfoBox) View() string {
+	ascii := `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⡆⠀⠀⠀⠀⢠⣾⣿⠟⠁⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⢀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣴⣶⣶⣤⡀⠀⠀⠀⢀⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢤⣤⣤⣤⣤⣤⣤⣽⣿⣷⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠻⣿⣷⣶⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⡗⠀⠀⠀⣾⣿⣿⠃⠀⠀⠀⠀⠀⣀⣀⣤⣤⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢿⣿⠿⠿⠿⠿⠛⠛⢻⣿⣿⡏⠉⠉⠉⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠈⠛⠛⠛⠉⠁⠀⠀⠀⠀⢠⣿⣿⡏⠀⠀⠀⣼⣿⣿⣷⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⠿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣼⣿⣿⣧⣤⣤⣤⣶⣶⣶⣶⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⡿⠀⠀⠀⣼⣿⡿⠛⠛⠛⠛⠛⠉⠉⣿⣿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⡿⠿⠿⠛⠛⠛⠛⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⢀⣀⣀⠀⠀⠀⠀⠀⢀⣀⣸⣿⣿⠇⠀⠀⣼⣿⡟⠁⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⢸⣿⣿⣇⣀⣀⣀⣀⣤⣤⣤⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠈⢻⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⠇⢀⣼⣿⢋⣤⣄⠀⠀⠀⠀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠾⠟⠁⠀⠙⢿⣷⣄⡀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢻⣿⣯⡉⠉⠉⠉⢸⣿⣿⡇⠀⠀⠀⢠⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⢠⣿⣿⣟⣀⣀⣀⣀⣠⣤⣤⣤⣄⡀⠀⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣀⣀⣀⣀⣀⣀⣠⣤⣤⣤⣽⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⢰⣿⡇⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⠿⠿⠿⠛⠛⠛⠛⠛⠋⠉⠉⠉⠉⠉⠉⠁⠀⠀⢀⣀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⠀⠀⠀⠀⠀⣠⣾⣿⡿⠋⠀⠻⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠁⠀⠀⣤⣦⣤⣤⣤⣤⣤⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠘⣿⣿⣷⣶⣶⣶⣶⣶⣾⣿⣿⣿⣷⠀⠀⣀⣴⣿⡿⠋⠀⠀⠀⠀⠈⢻⣿⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡿⠟⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠈⠙⠛⠿⠿⠿⠿⠟⠛⠛⠛⠋⠁⣠⣾⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣾⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉`
+	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
+	if !i.hasAnimeLoaded {
+		return i.styles.border.Height(i.height).Width(i.width).Render(asciiS.Render(ascii))
+	}
+
+	genresStr := strings.Join(i.genres, ", ")
+
+	var scrollIndicator string
+
+	content := lipgloss.JoinVertical(
+		lipgloss.Left,
+		i.styles.title.Render(i.title),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("English: "),
+			i.styles.value.Render(i.englishName),
+		),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("Type: "),
+			i.styles.value.Render(i.animeType),
+		),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("Status: "),
+			i.styles.value.Render(i.status),
+		),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("Rating: "),
+			i.styles.value.Render(i.rating),
+		),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("Genres: "),
+			i.styles.value.Render(genresStr),
+		),
+		"",
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			i.styles.label.Render("Description:"),
+			scrollIndicator,
+		),
+		i.styles.descriptionBox.Render(i.descViewport.View()),
+	)
+
+	if i.focused {
+		content = lipgloss.JoinVertical(
+			lipgloss.Left,
+			content,
+		)
+	}
+
+	return i.styles.border.Height(i.height).Width(i.width).Render(content)
+}
+
+func (i *InfoBox) ShortHelp() []key.Binding {
+	kb := make([]key.Binding, 0)
+	if i.focused {
+		kb = append(kb, i.keyMap.ScrollUp, i.keyMap.ScrollDown)
+	}
+	return kb
+}
+
+func (i *InfoBox) FullHelp() [][]key.Binding {
+	if !i.focused {
+		return nil
+	}
+
+	return [][]key.Binding{
+		{
+			i.keyMap.ScrollUp,
+			i.keyMap.ScrollDown,
+			i.keyMap.PageUp,
+			i.keyMap.PageDown,
+		},
+		{
+			i.keyMap.ScrollTop,
+			i.keyMap.ScrollBottom,
+		},
+	}
+}
