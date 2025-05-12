@@ -1,22 +1,57 @@
 package src
 
 import (
+	"strings"
+
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-type Tab2Model struct{}
+type Tab2Model struct {
+	showHelpMenu bool
+	width        int
+	height       int
+}
 
 func NewTab2Model() Tab2Model {
-	return Tab2Model{}
+	return Tab2Model{
+		showHelpMenu: false,
+	}
 }
 
 func (m Tab2Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m Tab2Model) Update(_ tea.Msg) (Tab2Model, tea.Cmd) {
-	// Tab2 doesn't react to input, just static content
+func (m Tab2Model) Update(msg tea.Msg) (Tab2Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if m.showHelpMenu {
+			switch {
+			case key.Matches(msg, keys.Esc):
+				m.showHelpMenu = false
+				return m, nil
+			case key.Matches(msg, keys.Help):
+				m.showHelpMenu = !m.showHelpMenu
+				return m, nil
+			default:
+				return m, nil
+			}
+		}
+
+		switch {
+		case key.Matches(msg, keys.Esc):
+			return m, tea.Quit
+		case key.Matches(msg, keys.Help):
+			m.showHelpMenu = !m.showHelpMenu
+			return m, nil
+		}
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+	}
+
 	return m, nil
 }
 
@@ -45,8 +80,8 @@ func (m Tab2Model) View() string {
 
 	desc := `Ever feel like your terminal was missing something? 
 Like, sure, it can handle your code, your servers, and maybe a cheeky game of Snake. 
-But where’s the anime?
-That’s where Kaizen steps in. It’s a beautifully minimal TUI for streaming anime, 
+But where's the anime?
+That's where Kaizen steps in. It's a beautifully minimal TUI for streaming anime, 
 right from your command line. No ads, no clutter, no browsers crying for mercy. 
 Just pure, uninterrupted anime bliss, wrapped in terminal aesthetics.
 Because why settle for basic when you can stream like a true minimalist? 
@@ -83,7 +118,7 @@ Enjoy your experience, and let Kaizen be your companion on your journey into the
 	email := link("\t  serene.brew.git@gmail.com")
 	emailText := "\t  ~developed by mintRaven & RiserSama\n" + email
 
-	return lipgloss.JoinVertical(
+	mainView := lipgloss.JoinVertical(
 		lipgloss.Top,
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
@@ -97,4 +132,29 @@ Enjoy your experience, and let Kaizen be your companion on your journey into the
 				LinksStyle.Render(sereneBrew),
 				FooterStyle.Render(emailText)),
 			LinksStyle.Render(devText)))
+
+	if m.showHelpMenu {
+		tempModel := Tab1Model{
+			width:  m.width,
+			height: m.height,
+		}
+		helpMenu := tempModel.renderHelpMenu()
+
+		helpMenuLines := strings.Split(helpMenu, "\n")
+		helpMenuHeight := len(helpMenuLines)
+
+		paddingTop := (m.height - helpMenuHeight) / 3
+		if paddingTop < 0 {
+			paddingTop = 0
+		}
+
+		helpMenuStyle := lipgloss.NewStyle().
+			PaddingTop(paddingTop).
+			Align(lipgloss.Center).
+			Width(m.width)
+
+		return helpMenuStyle.Render(helpMenu)
+	}
+
+	return mainView
 }
