@@ -14,11 +14,17 @@ It contains a single field, Result, which is a slice of slices containing interf
 This is used to store the search results from the API response.
 */
 type Anime struct {
-	ID       string   `json:"id"`
-	Title    string   `json:"title"`
-	SubCount float64  `json:"subCount"`
-	DubCount float64  `json:"dubCount"`
-	Episodes Episodes `json:"episodes"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	SubCount    float64  `json:"subCount"`
+	DubCount    float64  `json:"dubCount"`
+	Episodes    Episodes `json:"episodes"`
+	EnglishName string   `json:"englishName"`
+	Description string   `json:"description"`
+	Genres      []string `json:"genres"`
+	Status      string   `json:"status"`
+	Type        string   `json:"type"`
+	Rating      string   `json:"rating"`
 }
 
 // Episodes represents the subtitled and dubbed episode lists
@@ -46,7 +52,7 @@ The query string is used to build the API URL, and an HTTP GET request is sent t
 The function parses the JSON response and returns the Result field as a slice of slices of interface{}.
 If an error occurs at any stage, it is returned.
 
-resp -> string(animeID), string(animeName), float64(subEpisodes), float64(dubEpisodes) []string []string -> [][]interface{}
+resp -> string(animeID), string(animeName), float64(subEpisodes), float64(dubEpisodes), []string, []string, string(englishName), string(description), []string(genres), string(status), string(type), string(rating) -> [][]interface{}
 */
 func extractInfo(query string) ([][]any, error) {
 	apiURL := "https://heavenscape.vercel.app/api/anime/search/" + strings.ReplaceAll(query, " ", "+")
@@ -79,6 +85,12 @@ func extractInfo(query string) ([][]any, error) {
 			anime.DubCount,
 			anime.Episodes.Sub,
 			anime.Episodes.Dub,
+			anime.EnglishName,
+			anime.Description,
+			anime.Genres,
+			anime.Status,
+			anime.Type,
+			anime.Rating,
 		}
 		result = append(result, row)
 	}
