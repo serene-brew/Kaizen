@@ -14,6 +14,7 @@ import (
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	gloss "github.com/charmbracelet/lipgloss"
 )
 
@@ -86,6 +87,8 @@ type AnimeSelectedMsg struct {
 	AnimeName            string
 	AvailableSubEpisodes []string
 	AvailableDubEpisodes []string
+	AnimeRating          string
+	AnimeType            string
 }
 
 type downloadProgressMsg struct {
@@ -112,12 +115,12 @@ func NewMainModel() MainModel {
 
 	delegate := list.NewDefaultDelegate()
 
-	subList := list.New([]list.Item{}, delegate, 40, 10)
+	subList := list.New([]list.Item{}, delegate, 40, 20)
 	subList.Title = "Sub Episodes"
 	subList.SetShowHelp(false)
 	subList.SetFilteringEnabled(false)
 
-	dubList := list.New([]list.Item{}, delegate, 40, 10)
+	dubList := list.New([]list.Item{}, delegate, 40, 20)
 	dubList.Title = "Dub Episodes"
 	dubList.SetShowHelp(false)
 	dubList.SetFilteringEnabled(false)
@@ -183,8 +186,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.downloadM.height = m.height
 		m.downloadM.progress.Width = m.width - 60
 
-		m.downloadM.subList.SetSize(40, 10)
-		m.downloadM.dubList.SetSize(40, 10)
+		m.downloadM.subList.SetSize(40, 20)
+		m.downloadM.dubList.SetSize(40, 20)
 
 	case tea.KeyMsg:
 		switch m.currentScreen {
@@ -363,20 +366,23 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.downloadM.percent = 0
 							m.downloadM.downloadStatus = "Starting download..."
 							m.downloadM.downloadError = ""
+							showcase_filename := fmt.Sprintf("%s/%s_%s.mp4", m.tab1.animeName, m.downloadM.selectedEpisode, m.downloadM.episodeType)
+							m.DownloadFileName = showcase_filename
 
-							filename := fmt.Sprintf("%s/%s_%s.mp4", m.tab1.animeName, m.downloadM.episodeType, m.downloadM.selectedEpisode)
+							filename := fmt.Sprintf("%s_ep%s_%s.mp4", m.tab1.animeName, m.downloadM.selectedEpisode, m.downloadM.episodeType)
+
 							filename = strings.ReplaceAll(filename, " ", "_")
 							filename = strings.ReplaceAll(filename, ":", "")
-							filename = strings.ReplaceAll(filename, "/", "_")
 
 							m.DownloadFileName = filename
 							homeDIR, _ := os.UserHomeDir()
+							os.Mkdir(homeDIR+"/Videos/kaizen/"+m.tab1.animeName, 0755)
 
 							downloadCancelled = true
 							time.Sleep(100 * time.Millisecond)
 							downloadCancelled = false
 
-							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos", filename)
+							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos/kaizen/"+m.tab1.animeName, filename)
 							return m, downloadCmd
 						} else {
 							if err != nil {
@@ -423,22 +429,23 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.downloadM.isRunning = true
 							m.downloadM.isDownloading = true
 							m.downloadM.percent = 0
-							m.downloadM.downloadStatus = "Starting download..."
+							m.downloadM.downloadStatus = "Downloading..."
 							m.downloadM.downloadError = ""
+							//showcase_filename := fmt.Sprintf("%s/%s_%s.mp4", m.tab1.animeName, m.downloadM.selectedEpisode, m.downloadM.episodeType)
 
-							filename := fmt.Sprintf("%s/%s_%s.mp4", m.tab1.animeName, m.downloadM.episodeType, m.downloadM.selectedEpisode)
+							filename := fmt.Sprintf("%s_ep%s_%s.mp4", m.tab1.animeName, m.downloadM.selectedEpisode, m.downloadM.episodeType)
 							filename = strings.ReplaceAll(filename, " ", "_")
 							filename = strings.ReplaceAll(filename, ":", "")
-							filename = strings.ReplaceAll(filename, "/", "_")
 
 							m.DownloadFileName = filename
 							homeDIR, _ := os.UserHomeDir()
+							os.Mkdir(homeDIR+"/Videos/kaizen/"+m.tab1.animeName, 0755)
 
 							downloadCancelled = true
 							time.Sleep(100 * time.Millisecond)
 							downloadCancelled = false
 
-							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos", filename)
+							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos/kaizen/"+m.tab1.animeName, filename)
 							return m, downloadCmd
 						} else {
 							if err != nil {
@@ -666,11 +673,13 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Width(m.width - 20).
 			Align(gloss.Left)
 
+		homeDIR, _ := os.UserHomeDir()
 		animeInfo := []string{
 			labelStyle.Render("Anime: ") + valueStyle.Render(m.tab1.animeName),
-			labelStyle.Render("ID: ") + valueStyle.Render(m.tab1.animeID),
-			labelStyle.Render("Sub Episodes: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.subEpisodeNumber)),
-			labelStyle.Render("Dub Episodes: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.dubEpisodeNumber)),
+			labelStyle.Render("Rating: ") + valueStyle.Render(m.tab1.rating),
+			labelStyle.Render("Sub Eps: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.subEpisodeNumber)),
+			labelStyle.Render("Dub Eps: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.dubEpisodeNumber)),
+			labelStyle.Render("Download Location: ") + valueStyle.Render(homeDIR+"/Videos/kaizen"),
 		}
 
 		infoBox := gloss.NewStyle().
@@ -678,6 +687,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 			BorderForeground(gloss.Color(conf.defaultActiveTabDark)).
 			Padding(1).
 			Width(82).
+			Height(10).
 			Align(gloss.Left)
 
 		animeInfoRow1 := gloss.JoinHorizontal(gloss.Top,
@@ -688,8 +698,16 @@ Please resize the window to either full screen or reduce the text size of the wi
 			gloss.NewStyle().Width(m.width/3).Render(animeInfo[2]),
 			gloss.NewStyle().Width(m.width/3).Render(animeInfo[3]))
 
+		animeInfoRow3 := animeInfo[4]
+
+		TipsRow := "\n" + valueStyle.Render("Tips:") + "\n" +
+			valueStyle.Render("• Press ESC to return back to app") + "\n" +
+			valueStyle.Render("• Select an anime from the search table in app to download its episodes") + "\n" +
+			valueStyle.Render("• Select an episode from the lists below and press ENTER to start the download") + "\n" +
+			valueStyle.Render("• You can still go back to app while the download continues in background")
+
 		animeInfoSection := infoBox.Render(
-			gloss.JoinVertical(gloss.Left, animeInfoRow1, animeInfoRow2))
+			gloss.JoinVertical(gloss.Left, animeInfoRow1, animeInfoRow2, animeInfoRow3, TipsRow))
 
 		progressDisplay := m.downloadM.progress.ViewAs(m.downloadM.percent)
 
@@ -697,7 +715,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Padding(1).
 			Width(m.width - 20).
 			Align(gloss.Left).
-			Render(progressDisplay + "\n" + m.DownloadFileName)
+			Render(progressDisplay + "\n" + "Currently Processing: " + m.DownloadFileName)
 
 		// Update the lists with the available episodes
 		if len(m.downloadM.subList.Items()) == 0 && len(m.tab1.availableSubEpisodes) > 0 {
@@ -724,19 +742,6 @@ Please resize the window to either full screen or reduce the text size of the wi
 		episodeListsSection := gloss.NewStyle().
 			Align(gloss.Left).
 			Render(episodeLists)
-
-		streamLinkDisplay := ""
-		if m.downloadM.showStreamLink && m.downloadM.streamLink != "" {
-			streamLinkStyle := gloss.NewStyle().
-				Foreground(gloss.Color("#43BF6D")).
-				Border(gloss.RoundedBorder()).
-				BorderForeground(gloss.Color(conf.Tab1FocusActive)).
-				Padding(1).
-				Width(m.width - 20).
-				Align(gloss.Left)
-
-			streamLinkDisplay = streamLinkStyle.Render("Stream Link: " + m.downloadM.streamLink)
-		}
 
 		errorDisplay := ""
 		if m.downloadM.downloadError != "" {
@@ -766,13 +771,40 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Width(m.width - 20).
 			Align(gloss.Left).
 			Render(controls)
-
+		asciiStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#ff6699"))
+		ascii := `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢠⡖⢒⣲⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠛⠀⠀⠈⢧⠀⣀⡤⠖⠒⠲⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⡞⠋⠁⠀⠩⣻⣧⡀⠀⠀⠀⠀⠀⡰⠋⠉⢳⡄⠀⠀⡇⠀⠈⢆⠀⣤⣷⡁⢤⠀⠀⠀⠉⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢸⠙⢦⣀⣴⣶⣶⣿⣷⣦⣀⠀⠀⠀⣧⣀⣰⣾⣿⠀⠀⢷⣀⠦⣪⡆⡿⣿⣷⣣⡾⣂⣤⢠⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠳⣬⣛⣿⣿⣿⠏⠉⠉⠛⠿⣶⣦⣜⠿⣿⣿⢋⡴⠚⠩⢟⣿⣿⣷⣿⣿⣿⣿⣿⡻⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠉⣻⣿⣿⣿⡟⠁⠀⠩⠭⣉⣫⣻⣿⣿⣿⣿⣷⠿⣛⣉⠑⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠿⣿⣅⠀⠀⠀⠐⣊⢟⢿⣿⣿⢿⢷⣿⢵⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠤⣄⡀⠀⠀⠀⠀⠀⠀⠘⣿⣿⡶⠶⠻⡇⠊⠈⡏⣵⠣⢿⣶⣤⣤⡤⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠚⠁⠀⠀⠙⢦⡀⠀⠀⢀⣀⡤⣌⣻⣷⡀⢹⣷⡀⠀⠁⠁⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⠃⠀⢀⣠⣴⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢸⠃⠀⢀⠀⠰⡶⢐⢷⣠⠞⠉⠀⠀⠀⣿⡹⣿⣿⡏⠙⠓⠦⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣿⣶⣄⠀⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠸⣆⢠⣿⣷⣶⣸⡿⣿⣥⢠⢀⡴⠂⠀⠀⢹⠹⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⣄⢀⠀⠀⠈⢻⣿⣿⣷⣿⣿⣿⣿⣿⣿⢿⠿⠤⠦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⣠⠴⠒⠒⢛⡦⣿⣿⣿⣷⣧⣿⡷⣵⡯⢒⠀⠀⢀⡿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⣰⡃⠈⢧⠞⠉⣳⠀⠀⠀⠙⠻⣿⠟⠛⢿⣿⠟⡵⠃⠀⠀⠀⠙⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢀⣾⠅⠀⠐⣤⠿⢟⣯⣿⣿⣿⣿⣿⣿⣿⣊⣁⣠⣴⠟⠀⠀⠙⢿⣿⣧⡀⠀⠀⠀⠀⣿⠀⠀⢻⠀⠀⣯⡇⠀⠀⠀⢀⡏⠀⢤⠀⠈⢳⢁⣀⣶⠀⠀⠀⡿⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀
+⠀⣀⣀⣈⣷⣀⠀⠠⠤⣍⡻⣶⣾⣿⣿⣿⣿⢿⣿⠿⢯⣍⠁⠀⠀⠀⠀⠀⠻⣿⣷⣄⠀⠀⠀⣿⡴⣴⣿⡄⣰⣿⠁⠀⠀⠀⠘⣇⠀⢐⢽⣧⣤⣿⣿⣷⣰⠟⣴⡓⣩⣅⡀⠘⣧⡀⠀⠀⠀⠀
+⠀⠘⢿⣿⣿⣿⣿⣶⣶⣶⠟⣭⢾⣮⣿⣿⣿⣜⢽⡻⣦⣌⢷⣀⣀⣀⣀⣤⣶⣿⣿⣿⣧⡀⠀⠘⢿⣿⣿⣷⡿⠃⠀⠀⠀⠀⠀⢙⣷⣽⣿⣿⣻⣿⣽⣿⣿⣿⣯⡷⣟⣻⠁⠀⢨⡇⠀⠀⠀⠀
+⠀⠀⠀⣙⣻⣿⣿⣿⣿⠃⢨⢯⢋⠣⠟⣸⠸⡹⢧⠱⡌⠢⠘⡿⠿⠿⠻⠿⠛⠛⠛⠿⣿⣿⣷⣄⡀⢿⣿⠇⠀⠀⠀⠀⠀⢀⡴⢋⣁⢴⣿⣿⣿⣿⣿⣿⣿⡿⠿⢿⣉⠉⠀⣰⠟⠀⠀⠀⠀⠀
+⢀⣴⣿⣿⣿⣿⣿⣿⣿⠀⠀⠊⠘⠀⠀⣹⣆⠀⠀⠀⠀⠀⢠⣇⠀⠀⠀⠀⠀⠀⠀⠀⢈⣽⣿⣿⣿⣮⣿⣆⠀⠀⠀⠀⠀⡾⠀⠈⠉⢑⣮⡯⣿⣿⣿⣿⣿⡿⣛⡛⠏⠓⢿⡁⠀⠀⠀⠀⠀⠀
+⠀⣠⢋⡼⠋⠩⢛⣿⣿⣷⣤⣄⣀⣠⡾⠟⠙⠿⢶⣤⣴⠟⠛⠘⣷⣦⣀⢀⣠⢄⣀⠀⡏⠀⠀⠙⢿⠿⣿⣿⣶⣤⡀⠀⠀⠹⣇⡀⠀⠀⢀⡾⢫⣿⣻⢿⡻⣟⢯⠌⠑⠄⠀⢹⡄⠀⠀⠀⠀⠀
+⠀⣷⢼⠀⠀⠀⢸⢿⣿⣿⠃⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⡏⠀⠀⠈⢳⡁⢀⠀⠀⠈⣇⠈⠙⠿⣿⣿⣷⣦⣀⠉⠉⠛⠛⣿⠁⠀⠰⢹⢸⢁⣧⣕⡙⠂⠀⠀⣲⠃⠀⠀⠀⠀⠀
+⠀⠙⠲⣿⣶⡶⠋⣴⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⣀⣀⠐⢿⣧⢾⢰⢦⣦⣟⣀⣀⣀⠈⣿⣿⣿⣿⣿⣦⣄⠀⢻⣦⡀⠀⠋⢈⡼⠈⠙⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠘⠒⠚⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣻⠿⣶⣯⣿⣷⣾⣿⣿⣿⡿⣉⡄⠈⠙⢷⣿⠿⠛⠛⠻⢿⣿⣿⣶⣬⣿⣶⣶⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠞⠁⠀⣿⢶⣹⣿⣿⣿⣿⣿⣿⢷⠶⠄⠀⠀⢼⠆⠀⠀⠀⠀⠈⠙⠿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣇⠀⠀⢉⡤⣾⣿⣿⣿⡿⣿⣿⡟⠦⠀⠀⣀⡼⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣿⣿⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣈⡓⣤⡬⢩⡞⣡⡿⣹⣿⢿⣫⡈⢿⡿⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣉⣻⣿⣿⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⢛⣿⣿⣿⡟⡇⠀⠀⠉⠁⢻⠙⠘⠱⡁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⣿⣿⣿⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡞⠋⣠⣿⡿⣿⣿⡇⠙⠦⣤⡤⠟⠋⢧⡀⠀⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣯⡿⣷⣦⣀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡅⠀⠀⠀⣔⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣄⣀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠓⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠻⢿⣿⣿⠟⠉
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠀⠀`
 		mainContent := gloss.JoinVertical(gloss.Center, titleStyle.Render("Kaizen Download Manager"), gloss.JoinVertical(gloss.Left,
 			statusStyle.Render(status),
-			animeInfoSection,
-			episodeListsSection,
+			lipgloss.JoinHorizontal(lipgloss.Center, lipgloss.JoinVertical(lipgloss.Left, animeInfoSection, episodeListsSection), "                ", asciiStyle.Render(ascii)),
 			progressSection,
-			streamLinkDisplay,
 			errorDisplay,
 			controlsDisplay,
 		))
