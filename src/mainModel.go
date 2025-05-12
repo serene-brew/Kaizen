@@ -619,7 +619,6 @@ Please resize the window to either full screen or reduce the text size of the wi
 		mainStyle := gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
 			BorderForeground(gloss.Color("8")).
-			Padding(1, 1).
 			Width(m.width)
 
 		labelStyle := gloss.NewStyle().
@@ -767,7 +766,6 @@ Please resize the window to either full screen or reduce the text size of the wi
 
 		controlsDisplay := gloss.NewStyle().
 			Foreground(gloss.Color("#999999")).
-			Padding(1).
 			Width(m.width - 20).
 			Align(gloss.Left).
 			Render(controls)
