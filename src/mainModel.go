@@ -619,7 +619,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 		mainStyle := gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
 			BorderForeground(gloss.Color("8")).
-			Padding(2, 2).
+			Padding(1, 1).
 			Width(m.width)
 
 		labelStyle := gloss.NewStyle().
