@@ -1,8 +1,8 @@
 package src
 
 import (
-	"os"
 	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -21,13 +21,16 @@ var (
 type (
 	focus     int
 	Tab1Model struct {
-		focus   focus
-		styles  Tab1styles
-		inputM  textinput.Model
-		listOne list.Model
-		listTwo list.Model
-		table   table.Model
-		spinner spinner.Model
+		focus           focus
+		styles          Tab1styles
+		inputM          textinput.Model
+		listOne         list.Model
+		listTwo         list.Model
+		table           table.Model
+		spinner         spinner.Model
+		infoBox         InfoBox
+		showDownloadBox bool
+		showHelpMenu    bool
 
 		loading    bool
 		loadingMSG string
@@ -46,9 +49,15 @@ type (
 		streamLink           string
 		availableSubEpisodes []string
 		availableDubEpisodes []string
+
+		englishName string
+		description string
+		genres      []string
+		status      string
+		animeType   string
+		rating      string
 	}
 )
-
 type item struct {
 	title string
 	style string
@@ -59,6 +68,7 @@ const (
 	listTwoFocus
 	inputFocus
 	tableFocus
+	infoBoxFocus
 )
 
 func (i item) Title() string {
@@ -80,7 +90,6 @@ func (i item) FilterValue() string { return i.title }
  * Returns:
  * - A fully initialized `Tab1Model`.
  */
-
 func NewTab1Model() Tab1Model {
 	input := textinput.New()
 	input.Placeholder = "search your anime"
@@ -121,6 +130,7 @@ func NewTab1Model() Tab1Model {
 	list2.SetShowPagination(false)
 
 	styles := Tab1Styles()
+	infoBox := NewInfoBox()
 
 	return Tab1Model{
 		inputM:               input,
@@ -130,16 +140,25 @@ func NewTab1Model() Tab1Model {
 		focus:                inputFocus,
 		table:                SearchResults,
 		spinner:              spin,
-		data:                 [][]any{},
+		infoBox:              infoBox,
+		data:                 [][]interface{}{},
 		loading:              false,
 		loadingMSG:           "Searching for results...",
 		availableSubEpisodes: []string{},
 		availableDubEpisodes: []string{},
+		showDownloadBox:      false,
+		showHelpMenu:         false,
 	}
 }
 
 func (m Tab1Model) Init() tea.Cmd {
 	return nil
+}
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 /*
@@ -156,22 +175,33 @@ func (m Tab1Model) Init() tea.Cmd {
  * - A command (or batch of commands) for Bubble Tea to execute.
  */
 
-func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
-	defer func() {
-		if r := recover(); r != nil {
-			os.Exit(1)
-		}
-	}()
-
+func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.focus == inputFocus {
 		m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if m.showHelpMenu {
+			switch {
+			case key.Matches(msg, keys.Esc):
+				m.showHelpMenu = false
+				return m, nil
+			case key.Matches(msg, keys.Help):
+				m.showHelpMenu = !m.showHelpMenu
+				return m, nil
+			default:
+				return m, nil
+			}
+		}
+
 		switch {
-		// Handle key press events, changing focus and triggering actions.
+		case key.Matches(msg, keys.Help):
+			m.showHelpMenu = !m.showHelpMenu
+			return m, nil
 		case key.Matches(msg, keys.List1):
 			m.focus = listOneFocus
+			m.infoBox.Blur()
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
@@ -179,6 +209,7 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, keys.List2):
 			m.focus = listTwoFocus
+			m.infoBox.Blur()
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
@@ -186,19 +217,29 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, keys.Table):
 			m.focus = tableFocus
+			m.infoBox.Blur()
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			return m, nil
-
 		case key.Matches(msg, keys.Input):
 			m.focus = inputFocus
+			m.infoBox.Blur()
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			return m, nil
+		case key.Matches(msg, keys.InfoBox):
+			m.focus = infoBoxFocus
+			//	m.infoBox.Focus()
+			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+			return m, nil
+
 		case key.Matches(msg, keys.Enter):
 			switch m.focus {
 			case inputFocus:
@@ -206,6 +247,7 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+				m.infoBox.Blur()
 
 			case tableFocus:
 				if len(m.table.Rows()) != 0 {
@@ -217,6 +259,23 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 					m.focus = listOneFocus
 					m.availableSubEpisodes = m.data[idx-1][4].([]string)
 					m.availableDubEpisodes = m.data[idx-1][5].([]string)
+
+					m.englishName = m.data[idx-1][6].(string)
+					m.description = m.data[idx-1][7].(string)
+					m.genres = m.data[idx-1][8].([]string)
+					m.status = m.data[idx-1][9].(string)
+					m.animeType = m.data[idx-1][10].(string)
+					m.rating = m.data[idx-1][11].(string)
+
+					m.infoBox.SetAnimeInfo(
+						m.animeName,
+						m.englishName,
+						m.description,
+						m.genres,
+						m.status,
+						m.animeType,
+						m.rating,
+					)
 
 					if m.dubEpisodeNumber != 0 {
 						m.listOne.SetItems(m.generateSubEpisodes())
@@ -234,44 +293,64 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
 					m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.infoBox.Blur()
+
+					animeSelectedCmd := func() tea.Msg {
+						return AnimeSelectedMsg{
+							AnimeID:              m.animeID,
+							AnimeName:            m.animeName,
+							AvailableSubEpisodes: m.availableSubEpisodes,
+							AvailableDubEpisodes: m.availableDubEpisodes,
+						}
+					}
+
+					return m, animeSelectedCmd
 				} else {
 					m.focus = inputFocus
 					m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 					m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 					m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 					m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+					m.infoBox.Blur()
 				}
+
 			case listOneFocus:
 				m.streamSubAnime()
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
-			default:
+				m.infoBox.Blur()
+
+			case listTwoFocus:
 				m.streamDubAnime()
 				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+				m.infoBox.Blur()
 			}
 			return m, nil
 		}
 	}
 
-	// Update the active component based on focus, and return a batch of commands
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
-	switch m.focus {
-	case inputFocus:
+
+	if m.focus == infoBoxFocus {
+		var infoBoxCmd tea.Cmd
+		m.infoBox, infoBoxCmd = m.infoBox.Update(msg)
+		cmds = append(cmds, infoBoxCmd)
+	} else if m.focus == inputFocus {
 		m.inputM, cmd = m.inputM.Update(msg)
 		cmds = append(cmds, cmd)
-	case listOneFocus:
+	} else if m.focus == listOneFocus {
 		m.listOne, cmd = m.listOne.Update(msg)
 		cmds = append(cmds, cmd)
-	case tableFocus:
+	} else if m.focus == tableFocus {
 		m.table, cmd = m.table.Update(msg)
 		cmds = append(cmds, cmd)
-	default:
+	} else {
 		m.listTwo, cmd = m.listTwo.Update(msg)
 		cmds = append(cmds, cmd)
 	}
@@ -286,16 +365,6 @@ func (m Tab1Model) Update(msg tea.Msg) (Tab1Model, tea.Cmd) {
  * Renders the spinner when required, and removes when required
  */
 func (m Tab1Model) View() string {
-	helpDesc := lipgloss.Color("239")
-	helpTitle := lipgloss.Color("246")
-	HelpDesc := lipgloss.NewStyle().Foreground(helpDesc)
-	HelpTitle := lipgloss.NewStyle().Foreground(helpTitle)
-	m.inputM.Width = m.width
-	m.table.SetWidth(m.width + 3)
-	inputS := m.styles.inputBorder.Render(m.inputM.View())
-	list1 := m.styles.list1Border.Render(m.listOne.View())
-	list2 := m.styles.list2Border.Render(m.listTwo.View())
-	tableS := m.styles.tableBorder.Render(m.table.View())
 	ascii := `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -306,17 +375,78 @@ func (m Tab1Model) View() string {
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⡿⠀⠀⠀⣼⣿⡿⠛⠛⠛⠛⠛⠉⠉⣿⣿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⡿⠿⠿⠛⠛⠛⠛⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⢀⣀⣀⠀⠀⠀⠀⠀⢀⣀⣸⣿⣿⠇⠀⠀⣼⣿⡟⠁⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⢸⣿⣿⣇⣀⣀⣀⣀⣤⣤⣤⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠈⢻⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⠇⢀⣼⣿⢋⣤⣄⠀⠀⠀⠀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠾⠟⠁⠀⠙⢿⣷⣄⡀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢻⣿⣯⡉⠉⠉⠉⢸⣿⣿⡇⠀⠀⠀⢠⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⢸⣿⣿⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠾⠟⠁⠀⠙⢿⣷⣄⡀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⠀⢠⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⢠⣿⣿⣟⣀⣀⣀⣀⣠⣤⣤⣤⣄⡀⠀⠀⠀
                       ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣀⣀⣀⣀⣀⣀⣠⣤⣤⣤⣽⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀
                       ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⢰⣿⡇⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⠿⠿⠿⠛⠛⠛⠛⠛⠋⠉⠉⠉⠉⠉⠉⠁⠀⠀⢀⣀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁⠀⠀
                       ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⠀⠀⠀⠀⠀⣠⣾⣿⡿⠋⠀⠻⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠁⠀⠀⣤⣦⣤⣤⣤⣤⣤⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠘⣿⣿⣷⣶⣶⣶⣶⣶⣾⣿⣿⣿⣷⠀⠀⣀⣴⣿⡿⠋⠀⠀⠀⠀⠈⢻⣿⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡿⠟⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠈⠙⠛⠿⠿⠿⠿⠟⠛⠛⠛⠋⠁⣠⣾⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣾⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠘⣿⣿⣷⣶⣶⣶⣶⣶⣾⣿⣿⣿⣷⠀⠀⣀⣴⣿⡿⠋⠀⠀⠀⠀⠈⢻⣿⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡿⠟⠛⠛⠛⠛⠉⠉⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠈⠙⠛⠿⠿⠿⠿⠟⠛⠛⠛⠋⠁⣠⣾⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⡿⠟⠛⠛⠛⠛⠛⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                       ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉`
 	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
+	helpDesc := lipgloss.Color("239")
+	helpTitle := lipgloss.Color("246")
+	HelpDesc := lipgloss.NewStyle().Foreground(helpDesc)
+	HelpTitle := lipgloss.NewStyle().Foreground(helpTitle)
+
+	m.inputM.Width = m.width
+	m.table.SetWidth(m.width + 3)
+
+	m.infoBox.SetSize(m.inputM.Width-(m.listOne.Width()*2)+42, 21)
+
+	inputS := m.styles.inputBorder.Render(m.inputM.View())
+	list1 := m.styles.list1Border.Render(m.listOne.View())
+	list2 := m.styles.list2Border.Render(m.listTwo.View())
+	tableS := m.styles.tableBorder.Render(m.table.View())
+
+	var boxView string
+
+	boxView = m.infoBox.View()
+
+	var bottomLayout string
+	if m.animeName != "" {
+		bottomLayout = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			list1,
+			list2,
+			boxView)
+	} else {
+		bottomLayout = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			list1,
+			list2,
+			asciiS.Render(ascii))
+	}
+
+	mainLayout := lipgloss.JoinVertical(
+		lipgloss.Top,
+		inputS,
+		tableS,
+		bottomLayout,
+		"\n"+HelpTitle.Render("  esc")+HelpDesc.Render(" exit ")+
+			HelpDesc.Render("•")+HelpTitle.Render(" ?")+HelpDesc.Render(" help"))
+
+	if m.showHelpMenu {
+		helpMenu := m.renderHelpMenu()
+
+		helpMenuLines := strings.Split(helpMenu, "\n")
+		helpMenuHeight := len(helpMenuLines)
+
+		paddingTop := (m.height - helpMenuHeight) / 3
+		if paddingTop < 0 {
+			paddingTop = 0
+		}
+
+		helpMenuStyle := lipgloss.NewStyle().
+			PaddingTop(paddingTop).
+			Align(lipgloss.Center).
+			Width(m.width)
+
+		return helpMenuStyle.Render(helpMenu)
+	}
+
 	if m.loading {
 		return lipgloss.JoinVertical(
 			lipgloss.Top,
@@ -326,21 +456,10 @@ func (m Tab1Model) View() string {
 				m.spinner.View(),
 				lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1SpinnerMsgColor)).Render(m.loadingMSG)),
 			tableS,
-			lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				list1,
-				list2,
-				asciiS.Render(ascii)),
-			"\n"+HelpTitle.Render("  esc")+HelpDesc.Render(" exit the app ")+HelpDesc.Render("•")+HelpTitle.Render(" tab")+HelpDesc.Render(" switch tabs ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+1")+HelpDesc.Render(" focus input box ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+2")+HelpDesc.Render(" focus search results ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+3")+HelpDesc.Render(" focus sub episodes ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+4")+HelpDesc.Render(" focus dub episodes"))
+			bottomLayout,
+			"\n"+HelpTitle.Render("  esc")+HelpDesc.Render(" exit ")+
+				HelpDesc.Render("•")+HelpTitle.Render(" ?")+HelpDesc.Render(" help"))
 	}
-	return lipgloss.JoinVertical(
-		lipgloss.Top,
-		inputS,
-		tableS,
-		lipgloss.JoinHorizontal(
-			lipgloss.Top,
-			list1,
-			list2,
-			asciiS.Render(ascii)),
-		"\n"+HelpTitle.Render("  esc")+HelpDesc.Render(" exit the app ")+HelpDesc.Render("•")+HelpTitle.Render(" tab")+HelpDesc.Render(" switch tabs ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+1")+HelpDesc.Render(" focus input box ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+2")+HelpDesc.Render(" focus search results ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+3")+HelpDesc.Render(" focus sub episodes ")+HelpDesc.Render("•")+HelpTitle.Render(" shift+4")+HelpDesc.Render(" focus dub episodes"))
+
+	return mainLayout
 }
