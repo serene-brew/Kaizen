@@ -33,13 +33,13 @@ func ExpandPath(path string) string {
 }
 
 func ExecuteAppStub() {
-	m := MainModel{
-		currentTab:    0,
-		tab1:          NewTab1Model(),
-		tab2:          NewTab2Model(),
-		styles:        NewTabStyles(),
-		currentScreen: AppScreen,
-	}
+	m := NewMainModel()
+
+	m.currentTab = 0
+	m.tab1 = NewTab1Model()
+	m.tab2 = NewTab2Model()
+	m.styles = NewTabStyles()
+	m.currentScreen = AppScreen
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
