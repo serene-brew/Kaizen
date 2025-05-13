@@ -113,8 +113,8 @@ func NewTab1Model() Tab1Model {
 	columns := []table.Column{
 		{Title: centerText("", 10), Width: 10},
 		{Title: "Anime Title", Width: 75},
-		{Title: centerText("Sub Episodes", 20), Width: 20},
-		{Title: centerText("Dub Episodes", 20), Width: 20},
+		{Title: centerText("Sub Episodes", 15), Width: 15},
+		{Title: centerText("Dub Episodes", 15), Width: 15},
 		{Title: centerText("Score", 15), Width: 15},
 		{Title: centerText("Rating", 15), Width: 15},
 		{Title: centerText("Status", 15), Width: 15},
