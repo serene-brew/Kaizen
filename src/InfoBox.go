@@ -242,8 +242,11 @@ func (i *InfoBox) View() string {
 		Align(lipgloss.Center)
 
 	colWidth := (i.width - 6) / 2
-
 	downloadNotice := downloadNoticeStyle.Render(fmt.Sprintf("Press Ctrl+D to Download %s Episodes", i.title))
+	if len(i.title) > 51 {
+		animeTitle := i.title[0:51] + "..."
+		downloadNotice = downloadNoticeStyle.Render(fmt.Sprintf("Press Ctrl+D to Download %s Episodes", animeTitle))
+	}
 
 	content := lipgloss.JoinVertical(
 		lipgloss.Left,
