@@ -25,6 +25,7 @@ type Anime struct {
 	Status      string   `json:"status"`
 	Type        string   `json:"type"`
 	Rating      string   `json:"rating"`
+	Score       float64  `json:"score"`
 }
 
 // Episodes represents the subtitled and dubbed episode lists
@@ -91,6 +92,7 @@ func extractInfo(query string) ([][]any, error) {
 			anime.Status,
 			anime.Type,
 			anime.Rating,
+			anime.Score,
 		}
 		result = append(result, row)
 	}
