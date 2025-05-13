@@ -20,11 +20,43 @@ func (m *Tab1Model) generateRows(data [][]any) []table.Row {
 	m.loading = false
 	rows := []table.Row{}
 	for i, item := range data {
+		centerText := func(text string, width int) string {
+			if len(text) >= width {
+				return text
+			}
+			paddingTotal := width - len(text)
+			leftPadding := paddingTotal / 2
+			rightPadding := paddingTotal - leftPadding
+			return strings.Repeat(" ", leftPadding) + text + strings.Repeat(" ", rightPadding)
+		}
+
+		id := strconv.Itoa(i + 1)
+		title := item[1].(string)
+		subEpisodes := strconv.Itoa(int(item[2].(float64)))
+		dubEpisodes := strconv.Itoa(int(item[3].(float64)))
+
+		rating := item[11].(string)
+		if rating == "" {
+			rating = "-:-"
+		}
+
+		status := item[9].(string)
+		if status == "" {
+			status = "-:-"
+		}
+		scoreText := "N/A"
+		if score, ok := item[12].(float64); ok {
+			scoreText = fmt.Sprintf("%.1f", score)
+		}
+
 		rows = append(rows, table.Row{
-			strconv.Itoa(i + 1),
-			item[1].(string),
-			strconv.Itoa(int(item[2].(float64))),
-			strconv.Itoa(int(item[3].(float64))),
+			centerText(id, 10),
+			title,
+			centerText(subEpisodes, 20),
+			centerText(dubEpisodes, 20),
+			centerText(scoreText, 15),
+			centerText(rating, 15),
+			centerText(status, 20),
 		})
 	}
 	return rows
