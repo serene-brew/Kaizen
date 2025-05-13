@@ -56,6 +56,7 @@ type (
 		status      string
 		animeType   string
 		rating      string
+		score       float64
 	}
 )
 type item struct {
@@ -99,11 +100,24 @@ func NewTab1Model() Tab1Model {
 	spin.Spinner = spinner.Dot
 	spin.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1SpinnerColor))
 
+	centerText := func(text string, width int) string {
+		if len(text) >= width {
+			return text
+		}
+		paddingTotal := width - len(text)
+		leftPadding := paddingTotal / 2
+		rightPadding := paddingTotal - leftPadding
+		return strings.Repeat(" ", leftPadding) + text + strings.Repeat(" ", rightPadding)
+	}
+
 	columns := []table.Column{
-		{Title: "", Width: 10},
-		{Title: "Anime Title", Width: 100},
-		{Title: "Sub Episodes", Width: 30},
-		{Title: "Dub Episodes", Width: 30},
+		{Title: centerText("", 10), Width: 10},
+		{Title: "Anime Title", Width: 85},
+		{Title: centerText("Sub Episodes", 20), Width: 20},
+		{Title: centerText("Dub Episodes", 20), Width: 20},
+		{Title: centerText("Score", 15), Width: 15},
+		{Title: centerText("Rating", 15), Width: 15},
+		{Title: centerText("Status", 20), Width: 20},
 	}
 
 	SearchResults := table.New(
@@ -176,9 +190,8 @@ func max(a, b int) int {
  */
 
 func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.focus == inputFocus {
-		m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
-	}
+	//  NOTE: Dont modify border colors here; handle it in the specific key handlers
+	//  NOTE: This was causing inconsistent highlighting behavior
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -202,70 +215,111 @@ func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.List1):
 			m.focus = listOneFocus
 			m.infoBox.Blur()
+
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+
+			if m.loading {
+				m.loading = false
+			}
+
 			return m, nil
 		case key.Matches(msg, keys.List2):
 			m.focus = listTwoFocus
 			m.infoBox.Blur()
+
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+
+			if m.loading {
+				m.loading = false
+			}
+
 			return m, nil
 		case key.Matches(msg, keys.Table):
 			m.focus = tableFocus
 			m.infoBox.Blur()
+
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
+
+			if m.loading {
+				m.loading = false
+			}
+
 			return m, nil
 		case key.Matches(msg, keys.Input):
 			m.focus = inputFocus
 			m.infoBox.Blur()
+
+			m.inputM.Focus()
+
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+
+			m.loading = false
+
 			return m, nil
 		case key.Matches(msg, keys.InfoBox):
 			m.focus = infoBoxFocus
-			//	m.infoBox.Focus()
+			m.infoBox.Focus()
+
 			m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
 			m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
+
+			if m.loading {
+				m.loading = false
+			}
+
 			return m, nil
 
 		case key.Matches(msg, keys.Enter):
 			switch m.focus {
 			case inputFocus:
-				m.styles.inputBorder = m.styles.inputBorder.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
-				m.styles.list1Border = m.styles.list1Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
-				m.styles.list2Border = m.styles.list2Border.BorderForeground(lipgloss.Color(m.styles.inactiveColor))
-				m.styles.tableBorder = m.styles.tableBorder.BorderForeground(lipgloss.Color(m.styles.activeColor))
-				m.infoBox.Blur()
-
+				return m, nil
 			case tableFocus:
 				if len(m.table.Rows()) != 0 {
-					idx, _ := strconv.Atoi(m.table.SelectedRow()[0])
-					m.animeID = m.data[idx-1][0].(string)
-					m.animeName = m.table.SelectedRow()[1]
-					m.subEpisodeNumber, _ = strconv.Atoi(m.table.SelectedRow()[2])
-					m.dubEpisodeNumber, _ = strconv.Atoi(m.table.SelectedRow()[3])
-					m.focus = listOneFocus
-					m.availableSubEpisodes = m.data[idx-1][4].([]string)
-					m.availableDubEpisodes = m.data[idx-1][5].([]string)
+					idStr := strings.TrimSpace(m.table.SelectedRow()[0])
+					idx, _ := strconv.Atoi(idStr)
 
-					m.englishName = m.data[idx-1][6].(string)
-					m.description = m.data[idx-1][7].(string)
-					m.genres = m.data[idx-1][8].([]string)
-					m.status = m.data[idx-1][9].(string)
-					m.animeType = m.data[idx-1][10].(string)
-					m.rating = m.data[idx-1][11].(string)
+					dataIdx := idx - 1
+
+					m.animeID = m.data[dataIdx][0].(string)
+					m.animeName = m.table.SelectedRow()[1]
+					m.subEpisodeNumber, _ = strconv.Atoi(strings.TrimSpace(m.table.SelectedRow()[2]))
+					m.dubEpisodeNumber, _ = strconv.Atoi(strings.TrimSpace(m.table.SelectedRow()[3]))
+
+					scoreStr := strings.TrimSpace(m.table.SelectedRow()[4])
+					if scoreStr != "N/A" {
+						m.score, _ = strconv.ParseFloat(scoreStr, 64)
+					} else {
+						m.score = 0.0
+					}
+
+					m.rating = strings.TrimSpace(m.table.SelectedRow()[5])
+					m.status = strings.TrimSpace(m.table.SelectedRow()[6])
+					m.focus = listOneFocus
+					m.availableSubEpisodes = m.data[dataIdx][4].([]string)
+					m.availableDubEpisodes = m.data[dataIdx][5].([]string)
+
+					m.englishName = m.data[dataIdx][6].(string)
+					m.description = m.data[dataIdx][7].(string)
+					m.genres = m.data[dataIdx][8].([]string)
+					m.animeType = m.data[dataIdx][10].(string)
+
+					if scoreValue, ok := m.data[dataIdx][12].(float64); ok && m.score == 0 {
+						m.score = scoreValue
+					}
 
 					m.infoBox.SetAnimeInfo(
 						m.animeName,
@@ -275,6 +329,7 @@ func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.status,
 						m.animeType,
 						m.rating,
+						m.score,
 					)
 
 					if m.dubEpisodeNumber != 0 {
@@ -365,26 +420,26 @@ func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
  * Renders the spinner when required, and removes when required
  */
 func (m Tab1Model) View() string {
-	ascii := `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⡆⠀⠀⠀⠀⢠⣾⣿⠟⠁⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⢀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣴⣶⣶⣤⡀⠀⠀⠀⢀⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢤⣤⣤⣤⣤⣤⣤⣽⣿⣷⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠻⣿⣷⣶⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⡗⠀⠀⠀⣾⣿⣿⠃⠀⠀⠀⠀⠀⣀⣀⣤⣤⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢿⣿⠿⠿⠿⠿⠛⠛⢻⣿⣿⡏⠉⠉⠉⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠈⠛⠛⠛⠉⠁⠀⠀⠀⠀⢠⣿⣿⡏⠀⠀⠀⣼⣿⣿⣷⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⠿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣼⣿⣿⣧⣤⣤⣤⣶⣶⣶⣶⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⡿⠀⠀⠀⣼⣿⡿⠛⠛⠛⠛⠛⠉⠉⣿⣿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⡿⠿⠿⠛⠛⠛⠛⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⢀⣀⣀⠀⠀⠀⠀⠀⢀⣀⣸⣿⣿⠇⠀⠀⣼⣿⡟⠁⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⢸⣿⣿⣇⣀⣀⣀⣀⣤⣤⣤⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠈⢻⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⠇⢀⣼⣿⢋⣤⣄⠀⠀⠀⠀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠾⠟⠁⠀⠙⢿⣷⣄⡀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⠀⢠⣿⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⢠⣿⣿⣟⣀⣀⣀⣀⣠⣤⣤⣤⣄⡀⠀⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣀⣀⣀⣀⣀⣀⣠⣤⣤⣤⣽⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⢰⣿⡇⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⠿⠿⠿⠛⠛⠛⠛⠛⠋⠉⠉⠉⠉⠉⠉⠁⠀⠀⢀⣀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁⠀⠀
-                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⠀⠀⠀⠀⠀⣠⣾⣿⡿⠋⠀⠻⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠁⠀⠀⣤⣦⣤⣤⣤⣤⣤⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠘⣿⣿⣷⣶⣶⣶⣶⣶⣾⣿⣿⣿⣷⠀⠀⣀⣴⣿⡿⠋⠀⠀⠀⠀⠈⢻⣿⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡿⠟⠛⠛⠛⠛⠉⠉⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠈⠙⠛⠿⠿⠿⠿⠟⠛⠛⠛⠋⠁⣠⣾⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⡿⠟⠛⠛⠛⠛⠛⠉⠉⠉⠁⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉`
+	ascii := `
+                                                                         ⠀⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⣿⣿⣦⡀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡿⠃⠀
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⡆⠀⠀⠀⠀⢠⣾⣿⠟⠁⠀⢀⣀⠀
+                      ⠀⠀⢀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣴⣶⣶⣤⡀⠀⠀⠀⢀⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢤⣤⣤⣤⣤⣤⣤⣽⣿⣷⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆
+                      ⠀⠀⠻⣿⣷⣶⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⡗⠀⠀⠀⣾⣿⣿⠃⠀⠀⠀⠀⠀⣀⣀⣤⣤⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢿⣿⠿⠿⠿⠿⠛⠛⢻⣿⣿⡏⠉⠉⠉⠉⠉⠉⠉⠉⠉
+                      ⠀⠀⠀⠈⠛⠛⠛⠉⠁⠀⠀⠀⠀⢠⣿⣿⡏⠀⠀⠀⣼⣿⣿⣷⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⠿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣼⣿⣿⣧⣤⣤⣤⣶⣶⣶⣶⣶⣄
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⡿⠀⠀⠀⣼⣿⡿⠛⠛⠛⠛⠛⠉⠉⣿⣿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⡿⠿⠿⠛⠛⠛⠛⠛⠛⠋
+                      ⠀⠀⢀⣀⣀⠀⠀⠀⠀⠀⢀⣀⣸⣿⣿⠇⠀⠀⣼⣿⡟⠁⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⢸⣿⣿⣇⣀⣀⣀⣀⣤⣤⣤⣤⣄
+                      ⠀⠀⠈⢻⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⠇⢀⣼⣿⢋⣤⣄⠀⠀⠀⠀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠃
+                      ⠀⠀⠀⢸⣿⣿⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠾⠟⠁⠀⠙⢿⣷⣄⡀⠀⢀⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢻⣿⣯⡉⠉⠉⠉⢸⣿⣿⡇⠀⠀⠀⢠⣿⣿⡿⠃
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⣾⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣦⠀⠀⢸⣿⣿⡇⠀⠀⢠⣿⣿⣟⣀⣀⣀⣀⣠⣤⣤⣤⣄⡀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣀⣀⣀⣀⣀⣀⣠⣤⣤⣤⣽⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⢰⣿⡇⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⠿⠿⠿⠛⠛⠛⠛⠛⠋⠉⠉⠉⠉⠉⠉⠁⠀⠀⢀⣀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁⠀
+                      ⠀⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⠀⠀⠀⠀⠀⣠⣾⣿⡿⠋⠀⠻⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠁⠀⠀⣤⣦⣤⣤⣤⣤⣤⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀
+                      ⠀⠀⠀⠘⣿⣿⣷⣶⣶⣶⣶⣶⣾⣿⣿⣿⣷⠀⠀⣀⣴⣿⡿⠋⠀⠀⠀⠀⠈⢻⣿⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡿⠟⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠁⣿⣿⣿⡟⠁
+                      ⠀⠀⠀⠀⠈⠙⠛⠿⠿⠿⠿⠟⠛⠛⠛⠋⠁⣠⣾⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⡿
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣾⣿⣿
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣶⣶⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿
+                      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡿⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉    `
 	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
 	helpDesc := lipgloss.Color("239")
 	helpTitle := lipgloss.Color("246")
