@@ -254,7 +254,9 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						}
 						m.tab1.loading = true
 						m.tab1.focus = tableFocus
+						m.tab1.data = [][]interface{}{}
 						m.tab1.table.Focus()
+
 						m.tab1.styles.inputBorder = m.tab1.styles.inputBorder.BorderForeground(gloss.Color(m.tab1.styles.inactiveColor))
 						m.tab1.styles.list1Border = m.tab1.styles.list1Border.BorderForeground(gloss.Color(m.tab1.styles.inactiveColor))
 						m.tab1.styles.list2Border = m.tab1.styles.list2Border.BorderForeground(gloss.Color(m.tab1.styles.inactiveColor))
@@ -466,6 +468,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.tab1.listTwo.SetItems([]list.Item{item{title: "                         ", style: "none"}})
 		m.tab1.listOne.SetShowStatusBar(false)
 		m.tab1.listTwo.SetShowStatusBar(false)
+		m.tab1.loading = false
 
 		m.tab1.infoBox = NewInfoBox()
 		m.tab1.infoBox.SetSize(90, 10)
@@ -612,14 +615,17 @@ Please resize the window to either full screen or reduce the text size of the wi
 	case DownloadScreen:
 		titleStyle := gloss.NewStyle().
 			Bold(true).
-			Foreground(gloss.Color("87")).
+			Foreground(gloss.Color("#B3BEFE")).
 			MarginBottom(1).
 			Align(gloss.Center).
 			Width(65)
 		mainStyle := gloss.NewStyle().
 			Border(gloss.RoundedBorder()).
+			Align(lipgloss.Center).
 			BorderForeground(gloss.Color("8")).
-			Width(m.width)
+			Width(m.width).
+			Padding(0, 2, 0, 2).
+			MarginLeft(3)
 
 		labelStyle := gloss.NewStyle().
 			Foreground(gloss.Color("241")).
@@ -714,7 +720,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Padding(1).
 			Width(m.width - 20).
 			Align(gloss.Left).
-			Render(progressDisplay + "\n" + "Currently Processing: " + m.DownloadFileName)
+			Render(progressDisplay + "\n\n" + "Currently Processing: " + m.DownloadFileName)
 
 		// Update the lists with the available episodes
 		if len(m.downloadM.subList.Items()) == 0 && len(m.tab1.availableSubEpisodes) > 0 {
