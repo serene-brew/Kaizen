@@ -117,7 +117,7 @@ func NewTab1Model() Tab1Model {
 		{Title: centerText("Dub Episodes", 20), Width: 20},
 		{Title: centerText("Score", 15), Width: 15},
 		{Title: centerText("Rating", 15), Width: 15},
-		{Title: centerText("Status", 20), Width: 20},
+		{Title: centerText("Status", 15), Width: 15},
 	}
 
 	SearchResults := table.New(
