@@ -187,12 +187,17 @@ func getTableStyles() table.Styles {
 		BorderStyle(gloss.NormalBorder()).
 		BorderForeground(gloss.Color("240")).
 		BorderBottom(true).
-		Bold(false)
+		Bold(false).
+		Align(gloss.Center)
 
 	s.Selected = s.Selected.
 		Foreground(gloss.Color(conf.Tab1TableSelectedForeground)).
 		Background(gloss.Color(conf.Tab1TableSelectedBackground)).
-		Bold(false)
+		Bold(false).
+		Align(gloss.Center)
+
+	s.Cell = s.Cell.
+		Align(gloss.Center)
 
 	return s
 }
