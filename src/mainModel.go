@@ -281,7 +281,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case DownloadScreen:
 			switch msg.String() {
-			case "esc":
+			case "esc", "ctrl+d":
 				m.currentScreen = AppScreen
 				return m, nil
 			case "ctrl+c":
