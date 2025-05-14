@@ -186,8 +186,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.downloadM.height = m.height
 		m.downloadM.progress.Width = m.width - 60
 
-		m.downloadM.subList.SetSize(40, 20)
-		m.downloadM.dubList.SetSize(40, 20)
+		m.downloadM.subList.SetSize(40, 15)
+		m.downloadM.dubList.SetSize(40, 15)
 
 	case tea.KeyMsg:
 		switch m.currentScreen {
@@ -366,7 +366,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.downloadM.isRunning = true
 							m.downloadM.isDownloading = true
 							m.downloadM.percent = 0
-							m.downloadM.downloadStatus = "Starting download..."
+							m.downloadM.downloadStatus = "Downloading..."
 							m.downloadM.downloadError = ""
 							showcase_filename := fmt.Sprintf("%s/%s_%s.mp4", m.tab1.animeName, m.downloadM.selectedEpisode, m.downloadM.episodeType)
 							m.DownloadFileName = showcase_filename
@@ -717,7 +717,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 		progressDisplay := m.downloadM.progress.ViewAs(m.downloadM.percent)
 
 		progressSection := gloss.NewStyle().
-			Padding(1).
+			PaddingTop(1).
 			Width(m.width - 20).
 			Align(gloss.Left).
 			Render(progressDisplay + "\n\n" + "Currently Processing: " + m.DownloadFileName)
@@ -776,35 +776,8 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Align(gloss.Left).
 			Render(controls)
 		asciiStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#ff6699"))
-		ascii := `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢠⡖⢒⣲⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠛⠀⠀⠈⢧⠀⣀⡤⠖⠒⠲⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⡞⠋⠁⠀⠩⣻⣧⡀⠀⠀⠀⠀⠀⡰⠋⠉⢳⡄⠀⠀⡇⠀⠈⢆⠀⣤⣷⡁⢤⠀⠀⠀⠉⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⢸⠙⢦⣀⣴⣶⣶⣿⣷⣦⣀⠀⠀⠀⣧⣀⣰⣾⣿⠀⠀⢷⣀⠦⣪⡆⡿⣿⣷⣣⡾⣂⣤⢠⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠳⣬⣛⣿⣿⣿⠏⠉⠉⠛⠿⣶⣦⣜⠿⣿⣿⢋⡴⠚⠩⢟⣿⣿⣷⣿⣿⣿⣿⣿⡻⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠉⣻⣿⣿⣿⡟⠁⠀⠩⠭⣉⣫⣻⣿⣿⣿⣿⣷⠿⣛⣉⠑⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠿⣿⣅⠀⠀⠀⠐⣊⢟⢿⣿⣿⢿⢷⣿⢵⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠤⣄⡀⠀⠀⠀⠀⠀⠀⠘⣿⣿⡶⠶⠻⡇⠊⠈⡏⣵⠣⢿⣶⣤⣤⡤⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠚⠁⠀⠀⠙⢦⡀⠀⠀⢀⣀⡤⣌⣻⣷⡀⢹⣷⡀⠀⠁⠁⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⠃⠀⢀⣠⣴⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⢸⠃⠀⢀⠀⠰⡶⢐⢷⣠⠞⠉⠀⠀⠀⣿⡹⣿⣿⡏⠙⠓⠦⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣿⣶⣄⠀⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠸⣆⢠⣿⣷⣶⣸⡿⣿⣥⢠⢀⡴⠂⠀⠀⢹⠹⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⣄⢀⠀⠀⠈⢻⣿⣿⣷⣿⣿⣿⣿⣿⣿⢿⠿⠤⠦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⠴⠒⠒⢛⡦⣿⣿⣿⣷⣧⣿⡷⣵⡯⢒⠀⠀⢀⡿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⣰⡃⠈⢧⠞⠉⣳⠀⠀⠀⠙⠻⣿⠟⠛⢿⣿⠟⡵⠃⠀⠀⠀⠙⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⢀⣾⠅⠀⠐⣤⠿⢟⣯⣿⣿⣿⣿⣿⣿⣿⣊⣁⣠⣴⠟⠀⠀⠙⢿⣿⣧⡀⠀⠀⠀⠀⣿⠀⠀⢻⠀⠀⣯⡇⠀⠀⠀⢀⡏⠀⢤⠀⠈⢳⢁⣀⣶⠀⠀⠀⡿⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀
-⠀⣀⣀⣈⣷⣀⠀⠠⠤⣍⡻⣶⣾⣿⣿⣿⣿⢿⣿⠿⢯⣍⠁⠀⠀⠀⠀⠀⠻⣿⣷⣄⠀⠀⠀⣿⡴⣴⣿⡄⣰⣿⠁⠀⠀⠀⠘⣇⠀⢐⢽⣧⣤⣿⣿⣷⣰⠟⣴⡓⣩⣅⡀⠘⣧⡀⠀⠀⠀⠀
-⠀⠘⢿⣿⣿⣿⣿⣶⣶⣶⠟⣭⢾⣮⣿⣿⣿⣜⢽⡻⣦⣌⢷⣀⣀⣀⣀⣤⣶⣿⣿⣿⣧⡀⠀⠘⢿⣿⣿⣷⡿⠃⠀⠀⠀⠀⠀⢙⣷⣽⣿⣿⣻⣿⣽⣿⣿⣿⣯⡷⣟⣻⠁⠀⢨⡇⠀⠀⠀⠀
-⠀⠀⠀⣙⣻⣿⣿⣿⣿⠃⢨⢯⢋⠣⠟⣸⠸⡹⢧⠱⡌⠢⠘⡿⠿⠿⠻⠿⠛⠛⠛⠿⣿⣿⣷⣄⡀⢿⣿⠇⠀⠀⠀⠀⠀⢀⡴⢋⣁⢴⣿⣿⣿⣿⣿⣿⣿⡿⠿⢿⣉⠉⠀⣰⠟⠀⠀⠀⠀⠀
-⢀⣴⣿⣿⣿⣿⣿⣿⣿⠀⠀⠊⠘⠀⠀⣹⣆⠀⠀⠀⠀⠀⢠⣇⠀⠀⠀⠀⠀⠀⠀⠀⢈⣽⣿⣿⣿⣮⣿⣆⠀⠀⠀⠀⠀⡾⠀⠈⠉⢑⣮⡯⣿⣿⣿⣿⣿⡿⣛⡛⠏⠓⢿⡁⠀⠀⠀⠀⠀⠀
-⠀⣠⢋⡼⠋⠩⢛⣿⣿⣷⣤⣄⣀⣠⡾⠟⠙⠿⢶⣤⣴⠟⠛⠘⣷⣦⣀⢀⣠⢄⣀⠀⡏⠀⠀⠙⢿⠿⣿⣿⣶⣤⡀⠀⠀⠹⣇⡀⠀⠀⢀⡾⢫⣿⣻⢿⡻⣟⢯⠌⠑⠄⠀⢹⡄⠀⠀⠀⠀⠀
-⠀⣷⢼⠀⠀⠀⢸⢿⣿⣿⠃⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⡏⠀⠀⠈⢳⡁⢀⠀⠀⠈⣇⠈⠙⠿⣿⣿⣷⣦⣀⠉⠉⠛⠛⣿⠁⠀⠰⢹⢸⢁⣧⣕⡙⠂⠀⠀⣲⠃⠀⠀⠀⠀⠀
-⠀⠙⠲⣿⣶⡶⠋⣴⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⣀⣀⠐⢿⣧⢾⢰⢦⣦⣟⣀⣀⣀⠈⣿⣿⣿⣿⣿⣦⣄⠀⢻⣦⡀⠀⠋⢈⡼⠈⠙⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠘⠒⠚⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣻⠿⣶⣯⣿⣷⣾⣿⣿⣿⡿⣉⡄⠈⠙⢷⣿⠿⠛⠛⠻⢿⣿⣿⣶⣬⣿⣶⣶⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠞⠁⠀⣿⢶⣹⣿⣿⣿⣿⣿⣿⢷⠶⠄⠀⠀⢼⠆⠀⠀⠀⠀⠈⠙⠿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣇⠀⠀⢉⡤⣾⣿⣿⣿⡿⣿⣿⡟⠦⠀⠀⣀⡼⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣿⣿⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣈⡓⣤⡬⢩⡞⣡⡿⣹⣿⢿⣫⡈⢿⡿⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣉⣻⣿⣿⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⢛⣿⣿⣿⡟⡇⠀⠀⠉⠁⢻⠙⠘⠱⡁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⣿⣿⣿⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡞⠋⣠⣿⡿⣿⣿⡇⠙⠦⣤⡤⠟⠋⢧⡀⠀⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣯⡿⣷⣦⣀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡅⠀⠀⠀⣔⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣷⣦⣄⣀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠓⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠻⢿⣿⣿⠟⠉
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠀⠀`
+		ascii := sakuraAscii()
+
 		mainContent := gloss.JoinVertical(gloss.Center, titleStyle.Render("Kaizen Download Manager"), gloss.JoinVertical(gloss.Left,
 			statusStyle.Render(status),
 			lipgloss.JoinHorizontal(lipgloss.Center, lipgloss.JoinVertical(lipgloss.Left, animeInfoSection, episodeListsSection), "                ", asciiStyle.Render(ascii)),
