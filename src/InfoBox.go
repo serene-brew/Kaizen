@@ -204,7 +204,7 @@ func (i *InfoBox) Update(msg tea.Msg) (InfoBox, tea.Cmd) {
 }
 
 func (i *InfoBox) View() string {
-	ascii := kaizenLogoAscii()
+	ascii := kaizenJapaneseAscii()
 
 	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
 	if !i.hasAnimeLoaded {
