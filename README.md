@@ -1,6 +1,6 @@
 <div align="center">
 
-# Kaizen v1.1.4
+# Kaizen v2.0.0
 </div>
 <div align="center">
 
