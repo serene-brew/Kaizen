@@ -9,7 +9,7 @@ NC='\033[0m'
 
 # ASCII Art
 echo -e "${RED}"
-cat << "EOF"
+cat <<"EOF"
 
           ⠠⣤⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣶⡄⠀⠀⣼⠟⠁⠀⠀⠀⠀⠀
@@ -32,10 +32,10 @@ sleep 1
 
 # Check for MPV
 echo -e "${BLUE}[?] Checking for dependencies...${NC}"
-if ! command -v mpv &> /dev/null; then
-    echo -e "${YELLOW}[!] Error: MPV is not installed. Please install MPV first.${NC}"
-    sleep 2
-    exit 1
+if ! command -v mpv &>/dev/null; then
+  echo -e "${YELLOW}[!] Error: MPV is not installed. Please install MPV first.${NC}"
+  sleep 2
+  exit 1
 fi
 echo -e "${GREEN}[✓] MPV found${NC}"
 sleep 1
@@ -58,8 +58,8 @@ sleep 1
 # Build using make
 echo -e "${BLUE}[+] Building Kaizen...${NC}"
 if ! make; then
-    echo -e "${YELLOW}[!] Error: Build failed${NC}"
-    exit 1
+  echo -e "${YELLOW}[!] Error: Build failed${NC}"
+  exit 1
 fi
 echo -e "${GREEN}[✓] Build successful${NC}"
 sleep 1
