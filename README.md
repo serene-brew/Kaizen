@@ -24,8 +24,7 @@ No more context-switching, no more bloated browser tabs screaming at your CPU li
 
 So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode. 🌸✨ Terminal supremacy, but make it anime. 🎉
 
-
-https://github.com/user-attachments/assets/ed43bfb2-1338-4d63-86a1-1abb435382c5
+https://github.com/user-attachments/assets/babeee5f-7883-472f-8981-a4317ef6257f
 
 ## Installation, Update & Uninstallation
 >[!IMPORTANT]
@@ -74,34 +73,10 @@ kaizen -uninstall
 Once Kaizen is installed, you can find `config.yaml` file in your `~/.config/kaizen` directory. If it is not present, then copy the `config.yaml` into `~/.config/kaizen` directory. That file contains some default colors for kaizen, however you can modify it according to your own needs. 
 
 <h2 align="center"> Keybinds </h2>
-
-<table align=center>
-
-<tr><th> In app </th><th> In player </th></tr>
-<tr><td>
+<div align=center>
   
-| Operation       | Keybind       |
-|-----------------|----------------|
-| Toggle b/w tabs |     `tab`      |
-| Focus on Input  | `shift` + `1`  |
-| Focus on Results| `shift` + `2`  |
-| Focus on SUB ep | `shift` + `3`  |
-| Focus on DUB ep | `shift` + `4`  |
-| Exit the app    |     `esc`      |
-
-</td><td>
-
-| Operation       | Keybind       |
-|-----------------|----------------|
-| Pause and play  |    `space`     |
-| Forward & Backward  | `→` & `←`  |
-| Volume Control  |    `9` & `0`   |
-| Mute Audio      |           `m`  |
-| Adjust Brightness | `3` & `4`  |
-| Exit the player |     `q`        |
-
-</td></tr> 
-</table>
+![image](https://github.com/user-attachments/assets/262ba901-4af9-446b-99af-a67bf3dd1bf9)
+</div>
 
 > [!NOTE]
 > <h2> Known issues </h2>
