@@ -16,6 +16,7 @@ This is used to store the search results from the API response.
 type Anime struct {
 	ID          string   `json:"id"`
 	Title       string   `json:"title"`
+	Thumbnail   string   `json:"thumbnail"`
 	SubCount    float64  `json:"subCount"`
 	DubCount    float64  `json:"dubCount"`
 	Episodes    Episodes `json:"episodes"`
@@ -79,6 +80,10 @@ func extractInfo(query string) ([][]any, error) {
 	// Process the data into [][]interface{}
 	var result [][]any
 	for _, anime := range apiResponse.Result {
+		// Preserve the original column ordering expected elsewhere in the app
+		// (id, title, subCount, dubCount, subEpisodes, dubEpisodes, englishName,
+		// description, genres, status, type, rating, score) and append thumbnail
+		// as the last column so we don't break existing index-based access.
 		row := []any{
 			anime.ID,
 			anime.Title,
@@ -93,6 +98,7 @@ func extractInfo(query string) ([][]any, error) {
 			anime.Type,
 			anime.Rating,
 			anime.Score,
+			anime.Thumbnail,
 		}
 		result = append(result, row)
 	}
