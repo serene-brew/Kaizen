@@ -59,6 +59,7 @@ type InfoBox struct {
 	animeType      string
 	rating         string
 	score          float64
+	thumbnailURL   string
 	descViewport   viewport.Model
 	hasAnimeLoaded bool
 	styles         InfoBoxStyles
@@ -149,18 +150,32 @@ func (i *InfoBox) SetSize(width, height int) {
 }
 
 func (i *InfoBox) SetAnimeInfo(title, englishName, description string, genres []string, status, animeType, rating string, score float64) {
-	i.title = title
-	i.englishName = englishName
-	i.description = description
-	i.genres = genres
-	i.status = status
-	i.animeType = animeType
-	i.rating = rating
-	i.score = score
-	i.hasAnimeLoaded = true
+	if title == "" && englishName == "" && description == "" {
+		// If we're clearing the anime info, also clear the thumbnail
+		i.thumbnailURL = ""
+		i.hasAnimeLoaded = false
+	} else {
+		i.title = title
+		i.englishName = englishName
+		i.description = description
+		i.genres = genres
+		i.status = status
+		i.animeType = animeType
+		i.rating = rating
+		i.score = score
+		i.hasAnimeLoaded = true
+	}
 
 	i.descViewport.SetContent(description)
 	i.descViewport.GotoTop()
+}
+
+// SetAnimeInfoWithThumbnail stores the same metadata as SetAnimeInfo but also
+// accepts a thumbnail URL which will be rendered on the left side of the
+// InfoBox when View() is called.
+func (i *InfoBox) SetAnimeInfoWithThumbnail(title, englishName, description string, genres []string, status, animeType, rating string, score float64, thumbnailURL string) {
+	i.SetAnimeInfo(title, englishName, description, genres, status, animeType, rating, score)
+	i.thumbnailURL = thumbnailURL
 }
 
 func (i *InfoBox) ScrollPercent() float64 {
@@ -205,16 +220,19 @@ func (i *InfoBox) Update(msg tea.Msg) (InfoBox, tea.Cmd) {
 
 func (i *InfoBox) View() string {
 	ascii := kaizenJapaneseAscii()
-
 	asciiS := lipgloss.NewStyle().Foreground(lipgloss.Color(conf.Tab1KaizenAscciArtColor))
+
 	if !i.hasAnimeLoaded {
-		return i.styles.border.Height(i.height).Width(i.width).Render(asciiS.Render(ascii))
+		// Clear any existing thumbnail when showing ASCII art
+		i.thumbnailURL = ""
+		// Delete any existing images using Kitty's protocol
+		clearSeq := "\x1b_Ga=d\x1b\\"
+		return i.styles.border.Height(i.height).Width(i.width).Render(clearSeq + asciiS.Render(ascii))
 	}
 
 	genresStr := strings.Join(i.genres, ", ")
-
-	labelStyle := i.styles.label.Copy().Foreground(lipgloss.Color("242"))
-	valueStyle := i.styles.value.Copy().Foreground(lipgloss.Color("252"))
+	labelStyle := i.styles.label.Foreground(lipgloss.Color("242"))
+	valueStyle := i.styles.value.Foreground(lipgloss.Color("252"))
 
 	downloadNoticeStyle := lipgloss.NewStyle().
 		Padding(0, 1).
@@ -230,7 +248,8 @@ func (i *InfoBox) View() string {
 		downloadNotice = downloadNoticeStyle.Render(fmt.Sprintf("Press Ctrl+D to Download %s Episodes", animeTitle))
 	}
 
-	content := lipgloss.JoinVertical(
+	// Build the metadata content
+	metaContent := lipgloss.JoinVertical(
 		lipgloss.Left,
 		downloadNotice,
 		"",
@@ -289,20 +308,56 @@ func (i *InfoBox) View() string {
 			labelStyle.Render("Genres: "),
 			valueStyle.Render(genresStr),
 		),
+	)
+
+	// Handle the image section
+	var left string
+	if i.thumbnailURL != "" {
+		// Use smaller dimensions for the image to prevent layout issues
+		seq, err := RenderKittyImageFromURL(i.thumbnailURL, 100, 150)
+		if err == nil && seq != "" {
+			// Place image in a fixed-width container
+			imgStyle := lipgloss.NewStyle().
+				Width(15).
+				Align(lipgloss.Left).
+				PaddingRight(2).
+				MaxWidth(15)
+			left = imgStyle.Render(seq)
+		} else {
+			left = asciiS.Render(ascii)
+		}
+	} else {
+		left = asciiS.Render(ascii)
+	}
+
+	// Join image and metadata horizontally
+	topContent := lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		lipgloss.NewStyle().
+			Width(15).
+			MaxWidth(15).
+			Align(lipgloss.Left).
+			Render(left),
+		lipgloss.NewStyle().
+			PaddingLeft(1).
+			Width(i.width-39).
+			Render(metaContent),
+	)
+
+	// Create description section
+	descriptionContent := lipgloss.JoinVertical(
+		lipgloss.Left,
 		"",
-		lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			labelStyle.Render("Description:"),
-		),
+		labelStyle.Render("Description:"),
 		i.styles.descriptionBox.Render(i.descViewport.View()),
 	)
 
-	if i.focused {
-		content = lipgloss.JoinVertical(
-			lipgloss.Left,
-			content,
-		)
-	}
+	// Join everything vertically
+	content := lipgloss.JoinVertical(
+		lipgloss.Left,
+		topContent,
+		descriptionContent,
+	)
 
 	return i.styles.border.Height(i.height).Width(i.width).Render(content)
 }
