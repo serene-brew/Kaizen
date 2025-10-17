@@ -321,7 +321,15 @@ func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.score = scoreValue
 					}
 
-					m.infoBox.SetAnimeInfo(
+					var thumbnailURL string
+					// Thumbnail was appended as the last column in extractInfo
+					if len(m.data[dataIdx]) > 13 {
+						if t, ok := m.data[dataIdx][13].(string); ok {
+							thumbnailURL = t
+						}
+					}
+
+					m.infoBox.SetAnimeInfoWithThumbnail(
 						m.animeName,
 						m.englishName,
 						m.description,
@@ -330,6 +338,7 @@ func (m Tab1Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.animeType,
 						m.rating,
 						m.score,
+						thumbnailURL,
 					)
 
 					if m.dubEpisodeNumber != 0 {
