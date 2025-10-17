@@ -31,22 +31,61 @@ func (m *Tab1Model) generateRows(data [][]any) []table.Row {
 		}
 
 		id := strconv.Itoa(i + 1)
-		title := item[1].(string)
-		subEpisodes := strconv.Itoa(int(item[2].(float64)))
-		dubEpisodes := strconv.Itoa(int(item[3].(float64)))
+		// Safely extract fields with type tolerance since the API may return
+		// numbers as float64 or strings.
+		title, _ := item[1].(string)
 
-		rating := item[11].(string)
-		if rating == "" {
-			rating = "-:-"
+		// helper to coerce to int from float64 or string
+		toInt := func(v any) int {
+			switch t := v.(type) {
+			case float64:
+				return int(t)
+			case int:
+				return t
+			case string:
+				if t == "" {
+					return 0
+				}
+				if n, err := strconv.Atoi(t); err == nil {
+					return n
+				}
+				if f, err := strconv.ParseFloat(t, 64); err == nil {
+					return int(f)
+				}
+				return 0
+			default:
+				return 0
+			}
 		}
 
-		status := item[9].(string)
-		if status == "" {
-			status = "-:-"
+		subEpisodes := strconv.Itoa(toInt(item[2]))
+		dubEpisodes := strconv.Itoa(toInt(item[3]))
+
+		// rating and status may be strings or other types; safely stringify
+		rating := "-:-"
+		if v := item[11]; v != nil {
+			if s, ok := v.(string); ok && s != "" {
+				rating = s
+			}
 		}
+
+		status := "-:-"
+		if v := item[9]; v != nil {
+			if s, ok := v.(string); ok && s != "" {
+				status = s
+			}
+		}
+
 		scoreText := "N/A"
-		if score, ok := item[12].(float64); ok {
-			scoreText = fmt.Sprintf("%.1f", score)
+		switch s := item[12].(type) {
+		case float64:
+			scoreText = fmt.Sprintf("%.1f", s)
+		case string:
+			if s != "" {
+				if f, err := strconv.ParseFloat(s, 64); err == nil {
+					scoreText = fmt.Sprintf("%.1f", f)
+				}
+			}
 		}
 
 		rows = append(rows, table.Row{
