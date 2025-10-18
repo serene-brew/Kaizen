@@ -9,36 +9,31 @@ import (
 )
 
 func TestComponentFocusSimulation(t *testing.T) {
-	// Initialize the MainModel with Tab1Model
 	m := MainModel{
 		tab1: NewTab1Model(),
 	}
 
-	// Initial focus should be on the input
 	assert.Equal(t, inputFocus, m.tab1.focus, "Initial focus should be on input")
 
-	// Simulate pressing the key to focus table
-	newModel, _ := m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'@'}})
-	if newModel.focus != tableFocus {
-		t.Error("focus is not equal to tableFocus")
-		t.Error("expected: 3")
-		t.Error("actual: ", newModel.focus)
+	model, _ := m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'@'}})
+	if tab1Model, ok := model.(Tab1Model); ok {
+		assert.Equal(t, tableFocus, tab1Model.focus, "Focus should be on table")
+	} else {
+		t.Error("Could not convert model to Tab1Model")
 	}
 
-	// Simulate pressing the key to focus listOne
-	newModel, _ = m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'#'}})
-	if newModel.focus != listOneFocus {
-		t.Error("focus is not equal to listOneFocus")
-		t.Error("expected: 0")
-		t.Error("actual: ", newModel.focus)
+	model, _ = m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'#'}})
+	if tab1Model, ok := model.(Tab1Model); ok {
+		assert.Equal(t, listOneFocus, tab1Model.focus, "Focus should be on listOne")
+	} else {
+		t.Error("Could not convert model to Tab1Model")
 	}
 
-	// Simulate pressing the key to focus listTwo
-	newModel, _ = m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'$'}})
-	if newModel.focus != listTwoFocus {
-		t.Error("focus is not equal to listTwoFocus")
-		t.Error("expected: 1")
-		t.Error("actual: ", newModel.focus)
+	model, _ = m.tab1.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'$'}})
+	if tab1Model, ok := model.(Tab1Model); ok {
+		assert.Equal(t, listTwoFocus, tab1Model.focus, "Focus should be on listTwo")
+	} else {
+		t.Error("Could not convert model to Tab1Model")
 	}
 
 }
