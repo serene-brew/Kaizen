@@ -7,69 +7,55 @@ import (
 )
 
 func TestAppStateSimulation(t *testing.T) {
-	// Initialize your model
-	initialModel := MainModel{
-		currentScreen: AppScreen, // Initial state
-		width:         0,
-		height:        0,
-	}
-	//---------------------------------------------------------------------------------------------------
+	initialModel := NewMainModel()
+	initialModel.currentScreen = AppScreen
 
-	windowSizeMsg := tea.WindowSizeMsg{
-		Width:  120,
-		Height: 40,
-	}
-	// Update the model with the window size message
-	updatedModel, _ := initialModel.Update(windowSizeMsg)
-	// Assert the currentScreen state if applicable
-	if updatedModel.(MainModel).currentScreen != AppScreen {
-		t.Error("failed app state test")
-		t.Error("conditions: Width=120, Height=40")
-		t.Errorf("expected currentScreen to be AppScreen, got %v", updatedModel.(MainModel).currentScreen)
-	}
-
-	//---------------------------------------------------------------------------------------------------
-
-	windowSizeMsg = tea.WindowSizeMsg{
-		Width:  90,
-		Height: 40,
-	}
-	// Update the model with the window size message
-	updatedModel, _ = initialModel.Update(windowSizeMsg)
-	// Assert the currentScreen state if applicable
-	if updatedModel.(MainModel).currentScreen != ErrorScreen {
-		t.Error("failed app state test")
-		t.Error("conditions: Width=90, Height=40")
-		t.Errorf("expected currentScreen to be AppScreen, got %v", updatedModel.(MainModel).currentScreen)
-	}
-
-	//---------------------------------------------------------------------------------------------------
-
-	windowSizeMsg = tea.WindowSizeMsg{
-		Width:  120,
-		Height: 20,
-	}
-	// Update the model with the window size message
-	updatedModel, _ = initialModel.Update(windowSizeMsg)
-	// Assert the currentScreen state if applicable
-	if updatedModel.(MainModel).currentScreen != ErrorScreen {
-		t.Error("failed app state test")
-		t.Error("conditions: Width=120, Height=20")
-		t.Errorf("expected currentScreen to be AppScreen, got %v", updatedModel.(MainModel).currentScreen)
+	testCases := []struct {
+		name          string
+		width         int
+		height        int
+		expectedState AppState
+	}{
+		{
+			name:          "Valid dimensions",
+			width:         120,
+			height:        40,
+			expectedState: AppScreen,
+		},
+		{
+			name:          "Invalid width",
+			width:         90,
+			height:        40,
+			expectedState: ErrorScreen,
+		},
+		{
+			name:          "Invalid height",
+			width:         120,
+			height:        20,
+			expectedState: ErrorScreen,
+		},
+		{
+			name:          "Both dimensions invalid",
+			width:         90,
+			height:        20,
+			expectedState: ErrorScreen,
+		},
 	}
 
-	//---------------------------------------------------------------------------------------------------
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			msg := tea.WindowSizeMsg{
+				Width:  tc.width,
+				Height: tc.height,
+			}
 
-	windowSizeMsg = tea.WindowSizeMsg{
-		Width:  90,
-		Height: 20,
-	}
-	// Update the model with the window size message
-	updatedModel, _ = initialModel.Update(windowSizeMsg)
-	// Assert the currentScreen state if applicable
-	if updatedModel.(MainModel).currentScreen != ErrorScreen {
-		t.Error("failed app state test")
-		t.Error("conditions: Width=90, Height=20")
-		t.Errorf("expected currentScreen to be AppScreen, got %v", updatedModel.(MainModel).currentScreen)
+			updatedModel, _ := initialModel.Update(msg)
+			model := updatedModel.(MainModel)
+
+			if model.currentScreen != tc.expectedState {
+				t.Errorf("Test case '%s' failed:\nConditions: Width=%d, Height=%d\nExpected state: %v\nGot: %v",
+					tc.name, tc.width, tc.height, tc.expectedState, model.currentScreen)
+			}
+		})
 	}
 }
