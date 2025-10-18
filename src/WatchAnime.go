@@ -168,12 +168,6 @@ func NewTab1Model() Tab1Model {
 func (m Tab1Model) Init() tea.Cmd {
 	return nil
 }
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
 
 /*
  * Update
