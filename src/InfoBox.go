@@ -151,7 +151,6 @@ func (i *InfoBox) SetSize(width, height int) {
 
 func (i *InfoBox) SetAnimeInfo(title, englishName, description string, genres []string, status, animeType, rating string, score float64) {
 	if title == "" && englishName == "" && description == "" {
-		// If we're clearing the anime info, also clear the thumbnail
 		i.thumbnailURL = ""
 		i.hasAnimeLoaded = false
 	} else {
@@ -310,17 +309,15 @@ func (i *InfoBox) View() string {
 		),
 	)
 
-	// Handle the image section
+	// Thumbnail integation section
 	var left string
 	if i.thumbnailURL != "" {
-		// Use smaller dimensions for the image to prevent layout issues
-		seq, err := RenderKittyImageFromURL(i.thumbnailURL, 100, 150)
+		seq, err := RenderKittyImageFromURL(i.thumbnailURL, 110, 150)
 		if err == nil && seq != "" {
-			// Place image in a fixed-width container
 			imgStyle := lipgloss.NewStyle().
 				Width(15).
 				Align(lipgloss.Left).
-				PaddingRight(2).
+				PaddingRight(1).
 				MaxWidth(15)
 			left = imgStyle.Render(seq)
 		} else {
@@ -330,7 +327,6 @@ func (i *InfoBox) View() string {
 		left = asciiS.Render(ascii)
 	}
 
-	// Join image and metadata horizontally
 	topContent := lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		lipgloss.NewStyle().
@@ -343,22 +339,41 @@ func (i *InfoBox) View() string {
 			Width(i.width-39).
 			Render(metaContent),
 	)
-
+	content := ""
 	// Create description section
-	descriptionContent := lipgloss.JoinVertical(
-		lipgloss.Left,
-		"",
-		labelStyle.Render("Description:"),
-		i.styles.descriptionBox.Render(i.descViewport.View()),
-	)
-
-	// Join everything vertically
-	content := lipgloss.JoinVertical(
-		lipgloss.Left,
-		topContent,
-		descriptionContent,
-	)
-
+	if len(genresStr) > 82 {
+		descriptionContent := lipgloss.JoinVertical(
+			lipgloss.Left,
+			labelStyle.Render("Description:"),
+			i.styles.descriptionBox.Render(i.descViewport.View()),
+		)
+		content = lipgloss.JoinVertical(
+			lipgloss.Left,
+			topContent,
+			descriptionContent,
+		)
+	} else {
+		descriptionContent := lipgloss.JoinVertical(
+			lipgloss.Left,
+			"",
+			labelStyle.Render("Description:"),
+			i.styles.descriptionBox.Render(i.descViewport.View()),
+		)
+		content = lipgloss.JoinVertical(
+			lipgloss.Left,
+			topContent,
+			descriptionContent,
+		)
+	}
+	// --- IGNORE ---
+	// --- BUT DO NOT DELETE ---
+	// Create description section
+	// descriptionContent := lipgloss.JoinVertical(
+	// 	lipgloss.Left,
+	// 	"",
+	// 	labelStyle.Render("Description:"),
+	// 	i.styles.descriptionBox.Render(i.descViewport.View()),
+	// )
 	return i.styles.border.Height(i.height).Width(i.width).Render(content)
 }
 
