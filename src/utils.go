@@ -116,7 +116,7 @@ func (m *Tab1Model) streamSubAnime() {
 	m.streamLink = link
 	if m.streamLink != "" {
 		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (SUB)", m.animeName, m.subSelectedNum)
-		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
+		stream := exec.Command("mpv", "-fs", "--profile=fast", m.streamLink, streamTitle)
 		stream.Output() //nolint:errcheck
 	} else {
 		fmt.Println("no link found")
