@@ -1,6 +1,6 @@
 <div align="center">
 
-# Kaizen v2.0.0
+# Kaizen v2.1.0
 </div>
 <div align="center">
 
@@ -24,7 +24,7 @@ No more context-switching, no more bloated browser tabs screaming at your CPU li
 
 So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode. 🌸✨ Terminal supremacy, but make it anime. 🎉
 
-https://github.com/user-attachments/assets/babeee5f-7883-472f-8981-a4317ef6257f
+
 
 ## Installation, Update & Uninstallation
 >[!IMPORTANT]
