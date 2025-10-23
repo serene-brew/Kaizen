@@ -24,6 +24,8 @@ No more context-switching, no more bloated browser tabs screaming at your CPU li
 
 So, grab your instant ramen 🍜, fire up Kaizen, and let’s go full weeb mode. 🌸✨ Terminal supremacy, but make it anime. 🎉
 
+<img width="1810" height="1140" alt="kaizen_v2 1 0_ss" src="https://github.com/user-attachments/assets/77ccbf21-8de1-4945-a209-ed0b8af197a8" />
+
 
 
 ## Installation, Update & Uninstallation
