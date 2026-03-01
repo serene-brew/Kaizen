@@ -24,3 +24,5 @@ Tab1:
       color: "#c43b7b"
   ASCII Art:
       color: "#AA336A"
+
+DownloadToWorkingDirectory: false
