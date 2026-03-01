@@ -18,6 +18,8 @@ import (
 	gloss "github.com/charmbracelet/lipgloss"
 )
 
+// var conf = LoadConfig()
+
 var (
 	downloadPaused    bool
 	downloadCancelled bool
@@ -378,13 +380,17 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 							m.DownloadFileName = filename
 							homeDIR, _ := os.UserHomeDir()
+							wd, _ := os.Getwd()
 							os.Mkdir(homeDIR+"/Videos/kaizen/"+m.tab1.animeName, 0755)
 
 							downloadCancelled = true
 							time.Sleep(100 * time.Millisecond)
 							downloadCancelled = false
-
 							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos/kaizen/"+m.tab1.animeName, filename)
+
+							if conf.DownloadToWorkingDirectory == true {
+								downloadCmd = downloadFileCmd(link, wd, filename)
+							}
 							return m, downloadCmd
 						} else {
 							if err != nil {
@@ -442,12 +448,16 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.DownloadFileName = filename
 							homeDIR, _ := os.UserHomeDir()
 							os.Mkdir(homeDIR+"/Videos/kaizen/"+m.tab1.animeName, 0755)
+							wd, _ := os.Getwd()
 
 							downloadCancelled = true
 							time.Sleep(100 * time.Millisecond)
 							downloadCancelled = false
 
 							downloadCmd := downloadFileCmd(link, homeDIR+"/Videos/kaizen/"+m.tab1.animeName, filename)
+							if conf.DownloadToWorkingDirectory == true {
+								downloadCmd = downloadFileCmd(link, wd, filename)
+							}
 							return m, downloadCmd
 						} else {
 							if err != nil {
@@ -679,12 +689,19 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Align(gloss.Left)
 
 		homeDIR, _ := os.UserHomeDir()
+		wd, _ := os.Getwd()
+		downloadDir := "error"
+		if conf.DownloadToWorkingDirectory == true {
+			downloadDir = wd
+		} else {
+			downloadDir = homeDIR + "/Videos/kaizen"
+		}
 		animeInfo := []string{
 			labelStyle.Render("Anime: ") + valueStyle.Render(m.tab1.animeName),
 			labelStyle.Render("Rating: ") + valueStyle.Render(m.tab1.rating),
 			labelStyle.Render("Sub Eps: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.subEpisodeNumber)),
 			labelStyle.Render("Dub Eps: ") + valueStyle.Render(fmt.Sprintf("%d", m.tab1.dubEpisodeNumber)),
-			labelStyle.Render("Download Location: ") + valueStyle.Render(homeDIR+"/Videos/kaizen"),
+			labelStyle.Render("Download Location: ") + valueStyle.Render(downloadDir),
 		}
 
 		infoBox := gloss.NewStyle().

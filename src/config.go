@@ -29,6 +29,8 @@ type Config struct {
 	Tab1SpinnerColor            string
 	Tab1SpinnerMsgColor         string
 	Tab1KaizenAscciArtColor     string
+
+	DownloadToWorkingDirectory bool
 }
 
 /* LoadConfig function initializes the Config struct by reading values from a YAML configuration file.
@@ -91,6 +93,8 @@ func LoadConfig() Config {
 	Tab1SpinnerMsgColor := viper.GetString("Tab1.spinner.msg.color")
 	Tab1KaizenAscciArtColor := viper.GetString("Tab1.ASCII Art.color")
 
+	DownloadToWorkingDirectory := viper.GetBool("DownloadToWorkingDirectory")
+
 	conf.defaultUnfocusedDark = defaultUnfocusedDark
 	conf.defaultUnfocusedLight = defaultUnfocusedLight
 	conf.defaultForegroundLight = defaultForegroundLight
@@ -105,6 +109,8 @@ func LoadConfig() Config {
 	conf.Tab1SpinnerColor = Tab1SpinnerColor
 	conf.Tab1SpinnerMsgColor = Tab1SpinnerMsgColor
 	conf.Tab1KaizenAscciArtColor = Tab1KaizenAscciArtColor
+
+	conf.DownloadToWorkingDirectory = DownloadToWorkingDirectory
 
 	return conf
 }
