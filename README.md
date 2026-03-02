@@ -72,9 +72,10 @@ To uninstall
 kaizen -uninstall
 ```
 ## Configuration
-Once Kaizen is installed, you can find `config.yaml` file in your `~/.config/kaizen` directory. If it is not present, then copy the `config.yaml` into `~/.config/kaizen` directory. That file contains some default colors for kaizen, however you can modify it according to your own needs. 
+> [!NOTE]
+> To change the directory a file is downloaded to the working directory change the variable `DownloadToWorkingDirectory` to true inside the `config.yaml` file
 
-To change the directory a file is downloaded to the working directory change the variable DownloadToWorkingDirectory to true
+Once Kaizen is installed, you can find `config.yaml` file in your `~/.config/kaizen` directory. If it is not present, then copy the `config.yaml` into `~/.config/kaizen` directory. That file contains some default colors for kaizen, however you can modify it according to your own needs. 
 
 <h2 align="center"> Keybinds </h2>
 <div align=center>
