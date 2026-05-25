@@ -224,9 +224,9 @@ func (i *InfoBox) View() string {
 	if !i.hasAnimeLoaded {
 		// Clear any existing thumbnail when showing ASCII art
 		i.thumbnailURL = ""
-		// Delete any existing images using Kitty's protocol
-		clearSeq := "\x1b_Ga=d\x1b\\"
-		return i.styles.border.Height(i.height).Width(i.width).Render(clearSeq + asciiS.Render(ascii))
+		// Delete the thumbnail image using Kitty's protocol
+		clearSeq := ClearKittyImage()
+		return clearSeq + i.styles.border.Height(i.height).Width(i.width).Render(asciiS.Render(ascii))
 	}
 
 	genresStr := strings.Join(i.genres, ", ")
@@ -242,9 +242,15 @@ func (i *InfoBox) View() string {
 
 	colWidth := (i.width - 6) / 2
 	downloadNotice := downloadNoticeStyle.Render(fmt.Sprintf("Press Ctrl+D to Download %s Episodes", i.title))
-	if len(i.title) > 51 {
-		animeTitle := i.title[0:51] + "..."
+	if len(i.title) > 31 {
+		animeTitle := i.title[0:31] + "..."
 		downloadNotice = downloadNoticeStyle.Render(fmt.Sprintf("Press Ctrl+D to Download %s Episodes", animeTitle))
+	}
+	if len(i.englishName) > 31 {
+		i.englishName = i.englishName[0:31] + "..."
+
+	} else {
+		i.englishName = i.englishName
 	}
 
 	// Build the metadata content

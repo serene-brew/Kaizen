@@ -612,14 +612,17 @@ func (m MainModel) View() string {
 			m.tab1.focus = inputFocus
 			content = m.tab1.View()
 		case 1:
-			content = m.tab2.View()
+			// Clear thumbnail image when switching to About tab
+			content = ClearKittyImage() + m.tab2.View()
 		}
 
 		return gloss.JoinVertical(gloss.Top, tabsRow, content)
 
 	case ErrorScreen:
-		return centerStyle.Render(`Minimum window size is not met.
-minimum size = 100x40, current size = ` + fmt.Sprintf("%dx%d", m.width, m.height) + `
+		// Clear thumbnail image when switching to error screen
+		clearCmd := ClearKittyImage()
+		return clearCmd + centerStyle.Render(`Minimum window size is not met.
+minimum size = 100x40, current size = `+fmt.Sprintf("%dx%d", m.width, m.height)+`
 Please resize the window to either full screen or reduce the text size of the window`)
 
 	case DownloadScreen:
@@ -792,6 +795,8 @@ Please resize the window to either full screen or reduce the text size of the wi
 			Width(m.width - 20).
 			Align(gloss.Left).
 			Render(controls)
+		// Clear thumbnail image when switching to download screen
+		clearCmd := ClearKittyImage()
 		asciiStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#ff6699"))
 		ascii := sakuraAscii()
 
@@ -803,7 +808,7 @@ Please resize the window to either full screen or reduce the text size of the wi
 			controlsDisplay,
 		))
 
-		return gloss.Place(
+		return clearCmd + gloss.Place(
 			m.width,
 			m.height,
 			gloss.Center,

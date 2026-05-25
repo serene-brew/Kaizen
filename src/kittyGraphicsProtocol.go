@@ -100,16 +100,11 @@ func resizeImage(img image.Image, width, height int) image.Image {
 // buildKittySequence builds the kitty graphics escape sequence and returns it
 // as a string. We return the full sequence (possibly split into chunks) so
 // callers can place it inside their TUI output rather than printing it.
+// Uses image ID 1 for persistent image management across tab switches.
 func buildKittySequence(base64Data string) string {
 	chunkSize := 4096
 	dataLen := len(base64Data)
 	var out bytes.Buffer
-
-	// Save cursor position
-	out.WriteString("\x1b[s")
-
-	// Delete all images at the current cursor position
-	out.WriteString("\x1b_Ga=d\x1b\\")
 
 	for i := 0; i < dataLen; i += chunkSize {
 		end := i + chunkSize
@@ -120,15 +115,16 @@ func buildKittySequence(base64Data string) string {
 		chunk := base64Data[i:end]
 
 		if i == 0 {
-			// Place new image, using:
+			// Place new image with persistent ID, using:
+			// i=1: image ID (persistent across renders)
 			// f=100: PNG format
 			// a=T: transmit data as base64
 			// z=1: put in background
 			// C=1: allow cursor movement
 			if end >= dataLen {
-				out.WriteString(fmt.Sprintf("\x1b_Gf=100,a=T,z=1,C=1;%s\x1b\\", chunk))
+				out.WriteString(fmt.Sprintf("\x1b_Gi=1,f=100,a=T,z=1,C=1;%s\x1b\\", chunk))
 			} else {
-				out.WriteString(fmt.Sprintf("\x1b_Gf=100,a=T,z=1,C=1,m=1;%s\x1b\\", chunk))
+				out.WriteString(fmt.Sprintf("\x1b_Gi=1,f=100,a=T,z=1,C=1,m=1;%s\x1b\\", chunk))
 			}
 		} else if end >= dataLen {
 			out.WriteString(fmt.Sprintf("\x1b_Gm=0;%s\x1b\\", chunk))
@@ -137,8 +133,12 @@ func buildKittySequence(base64Data string) string {
 		}
 	}
 
-	// Restore cursor position
-	out.WriteString("\x1b[u")
-
 	return out.String()
+}
+
+// ClearKittyImage sends the Kitty graphics protocol command to delete the
+// thumbnail image (with ID 1). This should be called when switching away from
+// the info box or when the anime data is cleared.
+func ClearKittyImage() string {
+	return "\x1b_Gi=1,a=d\x1b\\"
 }

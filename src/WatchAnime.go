@@ -484,7 +484,8 @@ func (m Tab1Model) View() string {
 			Align(lipgloss.Center).
 			Width(m.width)
 
-		return helpMenuStyle.Render(helpMenu)
+		// Clear thumbnail image when displaying help menu
+		return ClearKittyImage() + helpMenuStyle.Render(helpMenu)
 	}
 
 	if m.loading {
