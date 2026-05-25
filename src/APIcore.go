@@ -136,3 +136,42 @@ func getStreamLink(id string, espisodeType string, episodeNumber string) (string
 
 	return response.Link, nil
 }
+
+/*
+ReferenceData represents the structure of the reference.json endpoint
+which contains HTTP header information like referer.
+*/
+type ReferenceData struct {
+	Referer string `json:"referer"`
+}
+
+/*
+getReferer is a function that retrieves the referer URL from the reference.json endpoint.
+This referer is used as an HTTP header when making streaming requests to bypass
+certain access restrictions.
+If an error occurs at any point, it is returned along with an empty string.
+
+resp -> string [Referer URL]
+*/
+func getReferer() (string, error) {
+	apiURL := "https://heavenscape.vercel.app/reference.json"
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var refData ReferenceData
+	err = json.Unmarshal(body, &refData)
+	if err != nil {
+		return "", err
+	}
+
+	return refData.Referer, nil
+}

@@ -115,8 +115,10 @@ func (m *Tab1Model) streamSubAnime() {
 	link, _ := getStreamLink(m.animeID, m.episodeType, m.subSelectedNum)
 	m.streamLink = link
 	if m.streamLink != "" {
+		referer, _ := getReferer()
 		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (SUB)", m.animeName, m.subSelectedNum)
-		stream := exec.Command("mpv", "-fs", "--profile=fast", m.streamLink, streamTitle)
+		headerFields := fmt.Sprintf("Referer: %s,User-Agent: Mozilla/5.0", referer)
+		stream := exec.Command("mpv", "--http-header-fields="+headerFields, "-fs", "--profile=fast", m.streamLink, streamTitle)
 		stream.Output() //nolint:errcheck
 	} else {
 		fmt.Println("no link found")
@@ -137,8 +139,10 @@ func (m *Tab1Model) streamDubAnime() {
 	link, _ := getStreamLink(m.animeID, m.episodeType, m.dubSelectedNum)
 	m.streamLink = link
 	if m.streamLink != "" {
+		referer, _ := getReferer()
 		streamTitle := fmt.Sprintf("--force-media-title=%s Episode %s (DUB)", m.animeName, m.dubSelectedNum)
-		stream := exec.Command("mpv", "-fs", m.streamLink, streamTitle)
+		headerFields := fmt.Sprintf("Referer: %s,User-Agent: Mozilla/5.0", referer)
+		stream := exec.Command("mpv", "--http-header-fields="+headerFields, "-fs", "--profile=fast", m.streamLink, streamTitle)
 		stream.Output() //nolint:errcheck
 	} else {
 		fmt.Println("no link found")
